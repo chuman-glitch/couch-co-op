@@ -215,7 +215,7 @@
 <body>
 <header class="top">
   <a class="logo" href="#"><img class="mark" src="favicon.svg" alt="" width="26" height="26">COUCH CO-OP</a>
-  <span class="study">Pilot · POST Houston</span>
+  <span class="study">Pilot at POST Houston · by <a href="https://novocollective.org" target="_blank" rel="noopener">Nōvo Collective</a></span>
   <nav><button class="btn ghost" data-open="menu" aria-haspopup="dialog">Index</button><button class="btn primary" data-open="book">Book the room</button></nav>
 </header>
 <div class="loader" aria-hidden="true"><p>LOADING THE LIVING ROOM <span id="loadtxt"></span></p><div class="track"><i id="loadbar"></i></div></div>
@@ -280,144 +280,101 @@
 
 <!-- ===== PANEL CONTENT (edit copy here) ===== -->
 <template id="panel-vision" data-title="Our vision">
-  <p class="kicker">Our vision</p>
-  <h3 class="display">Shoes off. <em>Settle in.</em></h3>
-  <p class="lead">A third space where people meet through cooperative games, interactive art and culture.</p>
-  <figure class="pic"><img src="images/win-vision.jpg" alt="Friends on a long floor sofa playing a co-op game on two screens"></figure>
-  <section class="grp">
-    <h4>House rules</h4>
-    <ul class="ticks"><li>Couches everywhere</li><li>Shoes off at the door</li><li>Room to sprawl on the floor</li></ul>
-  </section>
-  <section class="grp">
-    <h4>Not every game is about winning</h4>
-    <p>We pick cooperative experiences that get people talking, teaming up and discovering together. Play, watch, or just hang out.</p>
-  </section>
-  <section class="grp">
-    <h4>Two phases</h4>
-    <div class="phases">
-      <div><span class="chip">Now · Phase 1</span><p>A pop-up living room inside POST Houston: one scaffold structure, two consoles, 4–6 players.</p></div>
-      <div><span class="chip blue">Next · Phase 2</span><p>A permanent home for games and interactive art, with exhibitions, workshops and a full program.</p></div>
+  <div class="sum">
+    <figure class="pic"><img src="images/win-vision.jpg" alt="Friends on a long floor sofa playing a co-op game on two screens" width="960" height="540"></figure>
+    <div class="txt">
+      <p class="kicker">Our vision</p>
+      <h3 class="display">Shoes off. <em>Settle in.</em></h3>
+      <p class="lead">A third space where people meet through co-op games, interactive art and culture.</p>
+      <dl class="kv"><div><dt>Now</dt><dd>Phase 1: a pop-up living room at POST Houston</dd></div><div><dt>Next</dt><dd>Phase 2: a permanent home with exhibitions and workshops</dd></div><div><dt>Focus</dt><dd>Playing together, not winning</dd></div><div><dt>By</dt><dd><a href="https://novocollective.org" target="_blank" rel="noopener">Nōvo Collective</a></dd></div></dl>
+      <div class="acts"><button class="btn" data-open="dropin">Come play · free</button></div>
     </div>
-  </section>
-  <p class="small">An initiative by Nōvo Collective.</p>
+  </div>
+  <details class="more"><summary>About Nōvo Collective</summary><p>Couch Co-Op is an initiative by <a href="https://novocollective.org" target="_blank" rel="noopener">Nōvo Collective</a>, the team behind the idea, the room and the program. Say hello: <a class="mail" href="mailto:hi@novocollective.org">hi@novocollective.org</a></p></details>
 </template>
 
 <template id="panel-featured" data-title="Featured screen">
   <p class="kicker">The big screen</p>
   <h3 class="display">Now <em>featuring</em></h3>
   <p class="lead">The main screen hosts the featured co-op game. The first title will be announced soon.</p>
-  <p class="small">Want your game on this screen? <button class="link" data-open="publishers">See publisher packages →</button></p>
+  <div class="acts"><button class="btn" data-open="publishers">Publisher packages</button></div>
 </template>
 
 <template id="panel-sidescreen" data-title="Side screen">
-  <p class="kicker">The second screen</p>
-  <h3 class="display">Also <em>playing</em></h3>
-  <p class="lead">A smaller setup for indie co-op, experimental games and interactive art to try between rounds.</p>
-  <figure class="pic"><img src="images/win-sidescreen.jpg" alt="People playing with an interactive light installation projected on the floor and screens"></figure>
-  <section class="grp">
-    <h4>Lineup</h4>
-    <div class="lineup">
-      <div class="slot"><span>01</span>Indie co-op pick · TBA</div>
-      <div class="slot"><span>02</span>Interactive art piece · TBA</div>
-      <div class="slot"><span>03</span>Experimental game · TBA</div>
+  <div class="sum">
+    <figure class="pic"><img src="images/win-sidescreen.jpg" alt="People playing with an interactive light installation" width="960" height="540"></figure>
+    <div class="txt">
+      <p class="kicker">The second screen</p>
+      <h3 class="display">Also <em>playing</em></h3>
+      <p class="lead">A smaller setup for things to try between rounds.</p>
+      <dl class="kv"><div><dt>01</dt><dd>Indie co-op pick · TBA</dd></div><div><dt>02</dt><dd>Interactive art piece · TBA</dd></div><div><dt>03</dt><dd>Experimental game · TBA</dd></div><div><dt>Note</dt><dd>The lineup rotates through the pilot</dd></div></dl>
     </div>
-  </section>
-  <p class="small">The lineup rotates through the pilot.</p>
+  </div>
 </template>
 
 <template id="panel-setup" data-title="The setup">
-  <p class="kicker">How the room works</p>
-  <h3 class="display">Two consoles, <em>4–6 players</em></h3>
-  <p class="lead">A temporary living room built from scaffolding, steel and curtains inside POST Houston. Open enough to see in, enclosed enough to feel like yours.</p>
-  <figure class="pic"><img src="images/win-setup.jpg" alt="A scaffold tower with hanging screens and CRT monitors on cinderblocks, next to floor sofas"></figure>
-  <div class="facts">
-    <div><b>2</b><span>consoles</span></div>
-    <div><b>2</b><span>screens: featured + side</span></div>
-    <div><b>4–6</b><span>people at a time</span></div>
-  </div>
-  <section class="grp">
-    <h4>Two ways in</h4>
-    <div class="two-ways">
-      <button class="way" data-open="dropin"><b>Drop in</b><span>Free open play, 10am – 10pm</span></button>
-      <button class="way" data-open="book"><b>Book it</b><span>The room to yourselves, $15 / 2 hours</span></button>
+  <div class="sum">
+    <figure class="pic"><img src="images/win-setup.jpg" alt="A scaffold tower with hanging screens and CRT monitors on cinderblocks, next to floor sofas" width="960" height="540"></figure>
+    <div class="txt">
+      <p class="kicker">How the room works</p>
+      <h3 class="display">Two consoles, <em>4–6 players</em></h3>
+      
+      <dl class="kv"><div><dt>Structure</dt><dd>Scaffolding, steel and curtains</dd></div><div><dt>Screens</dt><dd>1 featured + 1 side screen</dd></div><div><dt>Seats</dt><dd>Floor sofas, poufs and rugs</dd></div><div><dt>Where</dt><dd>Inside POST Houston</dd></div></dl>
+      <div class="acts"><button class="btn" data-open="dropin">Drop in · free</button><button class="btn dark" data-open="book">Book · $15 / 2h</button></div>
     </div>
-  </section>
+  </div>
 </template>
 
 <template id="panel-dropin" data-title="Drop in">
-  <p class="kicker">Open play</p>
-  <h3 class="display">Free to play. <em>Just show up.</em></h3>
-  <p class="lead">Open <b>every day, 10am – 10pm</b>. Walk in, take your shoes off, join a game. No ticket, no sign-up.</p>
-  <figure class="pic"><img src="images/win-dropin.jpg" alt="People on poufs and bean bags with controllers in front of a big screen"></figure>
-  <section class="grp">
-    <h4>This week</h4>
-    <p class="small">When a group books the room it's private for that block. Check before you come.</p>
-    <div class="hours" id="openHoursList"></div>
-  </section>
-  <button class="btn" data-open="book">Book the room · $15 / 2 hours</button>
+  <div class="sum">
+    <figure class="pic"><img src="images/win-dropin.jpg" alt="People on poufs and bean bags with controllers in front of a big screen" width="960" height="540"></figure>
+    <div class="txt">
+      <p class="kicker">Open play</p>
+      <h3 class="display">Free to play. <em>Just show up.</em></h3>
+      
+      <dl class="kv"><div><dt>When</dt><dd>Every day, 10am – 10pm</dd></div><div><dt>Cost</dt><dd>Free, no ticket or sign-up</dd></div><div><dt>Room</dt><dd>2 consoles · 4–6 players</dd></div><div><dt>Rule</dt><dd>Shoes off at the rug</dd></div></dl>
+      <div class="acts"><button class="btn dark" data-open="book">Book the room · $15 / 2h</button></div>
+    </div>
+  </div>
+  <details class="more"><summary>Next 3 days</summary><p class="small">A private booking closes open play for that block.</p><div class="hours" id="openHoursList"></div></details>
 </template>
 
 <template id="panel-program" data-title="Program">
-  <p class="kicker">What's on</p>
-  <h3 class="display">Snacks <em>&amp; nights</em></h3>
-  <p class="lead">Co-op nights, launches and screenings during the pilot, growing into a full cultural program.</p>
-  <figure class="pic"><img src="images/win-program.jpg" alt="A screening night: people on red floor cushions facing a large projection"></figure>
-  <section class="grp">
-    <h4>During the pilot</h4>
-    <div class="program">
-      <div><h4>Publisher showcase</h4><p>Featured co-op titles on the main screen.</p></div>
-      <div><h4>Co-op nights</h4><p>Hosted play nights and friendly challenges.</p></div>
-      <div><h4>Launches &amp; previews</h4><p>First looks and early access.</p></div>
+  <div class="sum">
+    <figure class="pic"><img src="images/win-program.jpg" alt="A screening night: people on red floor cushions facing a large projection" width="960" height="540"></figure>
+    <div class="txt">
+      <p class="kicker">What's on</p>
+      <h3 class="display">Snacks <em>&amp; nights</em></h3>
+      
+      <dl class="kv"><div><dt>Co-op nights</dt><dd>Hosted play and friendly challenges</dd></div><div><dt>Launches</dt><dd>First looks and early access</dd></div><div><dt>Screenings</dt><dd>Films and game showcases</dd></div><div><dt>Later</dt><dd>Exhibitions, workshops and talks</dd></div></dl>
     </div>
-  </section>
-  <section class="grp">
-    <h4>Phase 2</h4>
-    <div class="program">
-      <div><h4>Exhibitions</h4><p>Rotating, long-term interactive work.</p></div>
-      <div><h4>Workshops &amp; labs</h4><p>Artist-led sessions and developer talks.</p></div>
-      <div><h4>Talks &amp; screenings</h4><p>Performances and gatherings.</p></div>
-    </div>
-  </section>
-  <p class="small">Dates will be posted here as the pilot is scheduled.</p>
+  </div>
+  <p class="small">Dates are posted here as the pilot is scheduled.</p>
 </template>
 
 <template id="panel-publishers" data-title="For publishers">
-  <p class="kicker">Publisher showcase</p>
-  <h3 class="display">Put your game <em>in the room</em></h3>
-  <p class="lead">Your game, played by real groups on real couches, inside one of Houston's busiest cultural venues.</p>
-  <figure class="pic"><img src="images/win-publishers.jpg" alt="A featured game on a large screen above a lounge of floor sofas and CRT monitors"></figure>
-  <section class="grp">
-    <h4>Packages</h4>
-    <div class="packages">
-      <article class="pkg">
-        <p class="chip">Standard</p>
-        <p class="price">$3,000</p>
-        <p class="term"><b>10 days</b> of placement, spread over two months</p>
-      </article>
-      <article class="pkg premium">
-        <p class="chip blue">Premium</p>
-        <p class="price">$7,000</p>
-        <p class="term"><b>30 days</b> of placement</p>
-      </article>
+  <div class="sum">
+    <figure class="pic"><img src="images/win-publishers.jpg" alt="A featured game on a large screen above a lounge of floor sofas and CRT monitors" width="960" height="540"></figure>
+    <div class="txt">
+      <p class="kicker">Publisher showcase</p>
+      <h3 class="display">Your game, <em>in the room</em></h3>
+      <p class="lead">Real groups playing on real couches, inside POST Houston.</p>
+      <dl class="kv"><div><dt>Standard</dt><dd><b>$3,000</b> · 10 days over two months</dd></div><div><dt>Premium</dt><dd><b>$7,000</b> · 30 days</dd></div><div><dt>You get</dt><dd>The main screen, foot traffic, an experiential campaign</dd></div></dl>
+      <div class="acts"><a class="btn dark" id="pubMail" href="mailto:hi@novocollective.org?subject=Couch%20Co-Op%20%C2%B7%20publisher%20placement">Request a placement</a><span class="small">or write to <a class="mail" href="mailto:hi@novocollective.org">hi@novocollective.org</a></span></div>
     </div>
-  </section>
-  <section class="grp">
-    <h4>What you get</h4>
-    <p>Audience discovery beyond the usual gaming channels, an experiential campaign, and visibility on the main screen. Tell us about your game and we'll plan the placement with you.</p>
-  </section>
-  <a class="btn" id="pubMail" href="#">Request a placement</a>
+  </div>
 </template>
 
 <template id="panel-visit" data-title="Visit us">
-  <p class="kicker">The first edition</p>
-  <h3 class="display">Find us at <em>POST Houston</em></h3>
-  <p class="lead">The pilot lives inside POST Houston, the former Barbara Jordan Post Office, next to the Theater District and Buffalo Bayou.</p>
-  <figure class="pic"><img src="images/post-map.jpg" alt="Map showing POST Houston between the Sawyer Heights neighborhood, the Theater District and Buffalo Bayou"></figure>
-  <section class="grp">
-    <h4>Address</h4>
-    <p><b>POST Houston</b><br>401 Franklin St, Houston, TX</p>
-  </section>
-  <p class="small">Exact spot and pilot dates coming soon. Questions? <a class="mail" href="mailto:hi@novocollective.org">hi@novocollective.org</a></p>
+  <div class="sum">
+    <figure class="pic"><img src="images/post-map.jpg" alt="Map showing POST Houston between Sawyer Heights, the Theater District and Buffalo Bayou" width="960" height="540"></figure>
+    <div class="txt">
+      <p class="kicker">Find us</p>
+      <h3 class="display">POST <em>Houston</em></h3>
+      
+      <dl class="kv"><div><dt>Address</dt><dd>401 Franklin St, Houston, TX</dd></div><div><dt>Hours</dt><dd>Daily, 10am – 10pm</dd></div><div><dt>Dates</dt><dd>Pilot dates coming soon</dd></div><div><dt>Contact</dt><dd><a class="mail" href="mailto:hi@novocollective.org">hi@novocollective.org</a></dd></div></dl>
+    </div>
+  </div>
 </template>
 
 <template id="panel-book" data-title="Book the room">
@@ -450,6 +407,7 @@
 <template id="panel-menu" data-title="Index">
   <p class="kicker">Everything in the room</p>
   <ul class="menu" id="menuList"></ul>
+  <p class="small credit">Couch Co-Op is a project by <a href="https://novocollective.org" target="_blank" rel="noopener">Nōvo Collective</a> · <a class="mail" href="mailto:hi@novocollective.org">hi@novocollective.org</a></p>
 </template>
 
 
@@ -457,7 +415,13 @@
 <script>
   const scene = document.getElementById("scene");
   // show the room only once every picture in it has arrived; retry any that fail
-  const ready = () => document.body.classList.add("ready");
+  const ready = () => {
+    if (document.body.classList.contains("ready")) return;
+    document.body.classList.add("ready");
+    // warm the cache for the pop-up photos so windows open instantly
+    setTimeout(() => document.querySelectorAll("template").forEach(t =>
+      t.content.querySelectorAll("img").forEach(i => { const im = new Image(); im.src = i.getAttribute("src"); })), 400);
+  };
   (() => {
     const imgs = [...scene.querySelectorAll("image")];
     const urls = [...new Set(imgs.map(i => i.getAttribute("href")))];

@@ -531,7 +531,7 @@ HTML = f'''<!doctype html>
 <body>
 <header class="top">
   <a class="logo" href="#"><img class="mark" src="favicon.svg" alt="" width="26" height="26">COUCH CO-OP</a>
-  <span class="study">Pilot · POST Houston</span>
+  <span class="study">Pilot at POST Houston · by <a href="https://novocollective.org" target="_blank" rel="noopener">Nōvo Collective</a></span>
   <nav><button class="btn ghost" data-open="menu" aria-haspopup="dialog">Index</button><button class="btn primary" data-open="book">Book the room</button></nav>
 </header>
 <div class="loader" aria-hidden="true"><p>LOADING THE LIVING ROOM <span id="loadtxt"></span></p><div class="track"><i id="loadbar"></i></div></div>
@@ -558,7 +558,13 @@ HTML = f'''<!doctype html>
 <script>
   const scene = document.getElementById("scene");
   // show the room only once every picture in it has arrived; retry any that fail
-  const ready = () => document.body.classList.add("ready");
+  const ready = () => {{
+    if (document.body.classList.contains("ready")) return;
+    document.body.classList.add("ready");
+    // warm the cache for the pop-up photos so windows open instantly
+    setTimeout(() => document.querySelectorAll("template").forEach(t =>
+      t.content.querySelectorAll("img").forEach(i => {{ const im = new Image(); im.src = i.getAttribute("src"); }})), 400);
+  }};
   (() => {{
     const imgs = [...scene.querySelectorAll("image")];
     const urls = [...new Set(imgs.map(i => i.getAttribute("href")))];
@@ -773,6 +779,32 @@ QUIET_CSS = """
   .pkg.premium { background:var(--cut) !important; }
   .menu button:hover .lbl { background:none !important; color:var(--cut) !important; }
   .rotate-title, .rotate-logo { font-family:var(--mono) !important; }
+  /* ---------- compact windows: picture beside a short fact table, one action, details folded ---------- */
+  .window { width:min(900px, calc(100% - 32px)) !important; }
+  .winbody { padding:24px 28px 26px !important; }
+  .winbody > * { max-width:none !important; }
+  .sum { display:grid; grid-template-columns:1.05fr 1fr; gap:28px; align-items:start; }
+  .sum .pic { aspect-ratio:4 / 3.3 !important; margin:0 !important; background:#e6e1d6 !important; }
+  .sum .pic img { width:100%; height:100%; object-fit:cover; display:block; }
+  .sum .display { font-size:clamp(28px,3vw,38px) !important; margin:0 0 12px !important; }
+  .sum .lead { font-size:15px !important; margin:0 0 14px !important; }
+  .kv { margin:0; border-top:1px solid #1412101f; }
+  .kv div { display:grid; grid-template-columns:96px 1fr; gap:12px; padding:9px 0; border-bottom:1px solid #1412101f; }
+  .kv dt { font:500 11px/1.65 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:#14121099; }
+  .kv dd { margin:0; font:400 14px/1.45 var(--sans); color:#141210; }
+  .acts { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:16px; }
+  .acts .small { margin:0 0 0 4px !important; }
+  .window .btn.dark { background:#141210 !important; color:#f3efe6 !important; box-shadow:none !important; }
+  .window a { color:var(--cut); }
+  .window a.btn { color:#f3efe6 !important; text-decoration:none; }
+  .more { margin-top:18px; border-top:1px solid #1412101f; padding-top:12px; }
+  .more summary { font:500 11px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase; cursor:pointer; list-style:none; color:#141210; }
+  .more summary::-webkit-details-marker { display:none; }
+  .more summary::before { content:"+ "; } .more[open] summary::before { content:"– "; }
+  .more p, .more .hours { margin:10px 0 0 !important; font-size:13px; }
+  .credit { margin-top:16px !important; }
+  .study a { color:inherit; text-decoration:underline; text-underline-offset:3px; }
+  @media (max-width:720px) { .sum { grid-template-columns:1fr; gap:16px; } .sum .pic { aspect-ratio:16 / 9 !important; } .kv div { grid-template-columns:84px 1fr; } }
   body.og .top nav, body.og .hud, body.og .ptags, body.og .loader, body.og .study, body.og .hero p { display:none !important; }
   body.og .collage { opacity:1 !important; transition:none !important; }
   @media (max-height:560px) { .hero h1 { font-size:22px !important; } .hero { top:48px !important; } .logo { font-size:12px !important; } }
