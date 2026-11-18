@@ -126,7 +126,7 @@ TOWER_POLY = [(282,0),(609,0),(609,806),(262,806),(262,228),(264,99),(282,90)]
 # the render's two real screens, in the same pixels: (id, corners, angle, slides, kicker, lines, size)
 SCREENS = [
   ("publishers", [(279,316),(426,277),(429,468),(280,474)], -14, ["slide1", "slide2", "slide3"], "FEATURED SCREEN", ["YOUR GAME", "HERE"], 16),
-  ("sidescreen", [(271,98),(435,38),(457,196),(293,229)], -20, ["slide4", "slide5"], "ALSO", ["PLAYING"], 22),
+  ("sidescreen", [(271,98),(435,38),(457,196),(293,229)], -20, ["slide4"], "ALSO", ["PLAYING"], 22),
 ]
 
 def screens_markup():
@@ -138,7 +138,7 @@ def screens_markup():
         poly = " ".join(f"{x},{y}" for x, y in pts)
         n = len(slides); period = 3 * n
         imgs = "".join(
-            f'<image class="slide" style="animation-duration:{period}s;animation-delay:{-(period - 3 * j) % period}s" '
+            f'<image{' class="slide"' if n > 1 else ""} style="animation-duration:{period}s;animation-delay:{-(period - 3 * j) % period}s" '
             f'href="concept/render/{sl}.jpg" x="{x0}" y="{y0}" width="{w}" height="{h}" preserveAspectRatio="xMidYMid slice"/>'
             for j, sl in enumerate(slides))
         lh = size * 1.05
