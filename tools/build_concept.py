@@ -682,7 +682,7 @@ HTML = f'''<!doctype html>
 </html>
 '''
 
-open(OUT, "w").write(HTML)
+open(os.path.join(ROOT, "website", "retro.html"), "w").write(HTML)   # the earlier Win98/CCTV look, kept for reference
 print("wrote", OUT)
 
 # ===================== quiet variant (website/quiet.html) =====================
@@ -696,7 +696,10 @@ QUIET_CSS = """
   html, body, .piece.decor, .piece, .screen, button, a, .ptag { cursor:auto; }
   .piece:not(.decor), .screen, button, a, .ptag .card, .ptag .dot { cursor:pointer; }
   body { font-family:var(--sans); }
-  .scan, .grain, .hud.bl { display:none !important; }
+  .scan, .grain { display:none !important; }
+  .hud.bl { font:400 12px/1 var(--mono) !important; letter-spacing:.06em !important; color:var(--q-ink) !important; text-shadow:none !important;
+    background:var(--q-bg); padding:7px 10px; gap:12px !important; }
+  .rec { color:#ff3b2f !important; } .rec::before { margin-right:6px; }
   /* top bar */
   .logo { font:500 15px/1 var(--mono) !important; letter-spacing:.14em !important; }
   .logo .mark { width:20px !important; height:20px !important; image-rendering:auto !important; vertical-align:-5px !important; margin-right:10px !important; }
@@ -770,6 +773,8 @@ QUIET_CSS = """
   .pkg.premium { background:var(--cut) !important; }
   .menu button:hover .lbl { background:none !important; color:var(--cut) !important; }
   .rotate-title, .rotate-logo { font-family:var(--mono) !important; }
+  body.og .top nav, body.og .hud, body.og .ptags, body.og .loader, body.og .study, body.og .hero p { display:none !important; }
+  body.og .collage { opacity:1 !important; transition:none !important; }
   @media (max-height:560px) { .hero h1 { font-size:22px !important; } .hero { top:48px !important; } .logo { font-size:12px !important; } }
 </style>
 """
@@ -780,11 +785,26 @@ QUIET_MARK = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
               '<circle cx="13" cy="12" r="1" fill="#6b3e1c"/><circle cx="20" cy="11" r="1" fill="#6b3e1c"/><circle cx="17" cy="15" r=".9" fill="#6b3e1c"/>'
               '</svg>\n')
 open(os.path.join(ROOT, "website", "mark-quiet.svg"), "w").write(QUIET_MARK)
-Q = HTML.replace("</head>", QUIET_CSS + "</head>", 1)
+OG = """
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Couch Co-Op">
+<meta property="og:title" content="Couch Co-Op · A public living room for play">
+<meta property="og:description" content="Co-op games and interactive art in a pop-up living room at POST Houston. Free open play daily, 10am–10pm.">
+<meta property="og:url" content="https://couchco-op.com/">
+<meta property="og:image" content="https://couchco-op.com/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A collage of a living room for play: floor sofas, CRT screens playing games, paper lanterns and a scaffold tower">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://couchco-op.com/og-image.jpg">
+<meta name="theme-color" content="#14110e">
+"""
+Q = HTML.replace("</head>", QUIET_CSS + OG + "</head>", 1)
+Q = Q.replace("<body>", '<body>\n<script>if (/[?&]og\\b/.test(location.search)) document.body.classList.add("og");</script>', 1)
 Q = Q.replace('<img class="mark" src="favicon.svg"', '<img class="mark" src="mark-quiet.svg"', 1)
 Q = Q.replace('<link rel="icon" href="favicon.svg" type="image/svg+xml">', '<link rel="icon" href="mark-quiet.svg" type="image/svg+xml">', 1)
 Q = Q.replace("LOADING THE LIVING ROOM", "LOADING", 1)
 Q = Q.replace("'<span class=\"open\">● OPEN NOW</span> · 10–22'", "'<span class=\"open\">Open now</span> · daily 10–22'", 1)
 Q = Q.replace("'<span class=\"closed\">○ CLOSED</span> · OPEN 10–22'", "'<span class=\"closed\">Closed</span> · open daily 10–22'", 1)
-open(os.path.join(ROOT, "website", "quiet.html"), "w").write(Q)
-print("wrote quiet.html")
+open(OUT, "w").write(Q)
+print("wrote index.html (quiet + REC)")
