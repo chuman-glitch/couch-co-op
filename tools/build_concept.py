@@ -701,7 +701,7 @@ QUIET_CSS = """
   .rec { color:#ff3b2f !important; } .rec::before { margin-right:6px; }
   /* top bar */
   .logo { font:500 15px/1 var(--mono) !important; letter-spacing:.14em !important; }
-  .logo .mark { width:20px !important; height:20px !important; image-rendering:auto !important; vertical-align:-5px !important; margin-right:10px !important; }
+  .logo .mark { width:24px !important; height:24px !important; image-rendering:pixelated !important; vertical-align:-5px !important; margin-right:10px !important; }
   .study { font:400 12px var(--mono) !important; letter-spacing:.06em !important; color:var(--q-dim) !important; }
   .btn, .btn.ghost { font:500 12px/1 var(--mono) !important; letter-spacing:.08em !important; text-transform:uppercase; padding:10px 14px !important;
     background:transparent !important; color:var(--q-ink) !important; box-shadow:inset 0 0 0 1px var(--q-line) !important; border-radius:0 !important; }
@@ -800,8 +800,6 @@ OG = """
 """
 Q = HTML.replace("</head>", QUIET_CSS + OG + "</head>", 1)
 Q = Q.replace("<body>", '<body>\n<script>if (/[?&]og\\b/.test(location.search)) document.body.classList.add("og");</script>', 1)
-Q = Q.replace('<img class="mark" src="favicon.svg"', '<img class="mark" src="mark-quiet.svg"', 1)
-Q = Q.replace('<link rel="icon" href="favicon.svg" type="image/svg+xml">', '<link rel="icon" href="mark-quiet.svg" type="image/svg+xml">', 1)
 Q = Q.replace("LOADING THE LIVING ROOM", "LOADING", 1)
 Q = Q.replace("'<span class=\"open\">● OPEN NOW</span> · 10–22'", "'<span class=\"open\">Open now</span> · daily 10–22'", 1)
 Q = Q.replace("'<span class=\"closed\">○ CLOSED</span> · OPEN 10–22'", "'<span class=\"closed\">Closed</span> · open daily 10–22'", 1)
