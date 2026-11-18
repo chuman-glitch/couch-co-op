@@ -49,6 +49,8 @@ WAVY = Q("screen-wavy", 689, 900)
 STEEL = Q("steel-panel", 332, 900)
 PIPES = Q("pipes", 600, 900)
 LANTERNS = Q("lanterns", 621, 788)
+SOFA_CURVE = Q("sofa-curve", 900, 249)
+CABLES = Q("cables", 812, 900)
 MUSHROOM = Q("lamp-mushroom", 398, 900)
 RACK_F = Q("rack-forest", 569, 900)
 
@@ -169,10 +171,11 @@ PIECES = [
   dict(id="program", src=CRT_BLOCKS, at=(1450,900), s=0.48, r=0, tv=TV_BLOCKS),
   dict(id=None,     src=MUSHROOM,  at=(330,960),   s=0.36, r=0),
   # front: one floor sofa, one lounge chair, one pouf
-  dict(id="dropin", src=FLOOR_SOFA, at=(640,1050), s=0.7,  r=-2),
+  dict(id="dropin", src=SOFA_CURVE, at=(640,1060), s=0.74, r=-1),
   dict(id="book",   src=TOGO,      at=(1300,1060), s=0.52, r=3),
   dict(id="visit",  src=CRT_CAM,   at=(200,1080),  s=0.36, r=-3, tv=TV_CAM),
   dict(id=None,     src=POUF,      at=(990,1195),  s=0.34, r=-1),
+  dict(id=None,     src=CABLES,    at=(1885,1160), s=0.42, r=0),
   # a clamp lamp hung off the rack: the light switch
   dict(id=None,     src=LAMP,      at=(1520,300),  s=0.3,  r=0),
 ]
