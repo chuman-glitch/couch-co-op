@@ -50,6 +50,8 @@ STEEL = Q("steel-panel", 332, 900)
 PIPES = Q("pipes", 600, 900)
 LANTERNS = Q("lanterns", 621, 788)
 SOFA_CURVE = Q("sofa-curve", 900, 249)
+PLAYER1 = Q("player1", 364, 341)
+PLAYER2 = Q("player2", 308, 310)
 CABLES = Q("cables", 812, 900)
 MUSHROOM = Q("lamp-mushroom", 398, 900)
 RACK_F = Q("rack-forest", 569, 900)
@@ -172,8 +174,11 @@ PIECES = [
   dict(id=None,     src=MUSHROOM,  at=(330,960),   s=0.36, r=0),
   # front: one floor sofa, one lounge chair, one pouf
   dict(id="dropin", src=SOFA_CURVE, at=(640,1060), s=0.74, r=-1),
-  dict(id="book",   src=TOGO,      at=(1300,1060), s=0.52, r=3),
+  dict(id="book",   src=TOGO,      at=(1300,1060), s=0.52, r=-3, flip=True),
   dict(id="visit",  src=CRT_CAM,   at=(200,1080),  s=0.36, r=-3, tv=TV_CAM),
+  # two players drop in from the sky and sit behind the pouf, facing the big screen
+  dict(id=None,     src=PLAYER2,   at=(1082,1068), s=0.58,  r=0, cls="player p2", delay=1.15),
+  dict(id=None,     src=PLAYER1,   at=(930,1064),  s=0.6,  r=0, cls="player p1", delay=0.85),
   dict(id=None,     src=POUF,      at=(990,1195),  s=0.34, r=-1),
   dict(id=None,     src=CABLES,    at=(1885,1160), s=0.42, r=0),
   # a clamp lamp hung off the rack: the light switch
@@ -234,14 +239,15 @@ for i, p in enumerate(PIECES):
         else:
             art = f'<g{mask}><image class="{cls}" href="{img}" width="{w}" height="{h}"/></g>'
     s, sy = p["s"], p["s"] * p.get("sy", 1)
-    tf = f'translate({p["at"][0]} {p["at"][1]}) rotate({p["r"]}) scale({s} {sy}) translate({-cx:.1f} {-cy:.1f})'
+    sx = -s if p.get("flip") else s
+    tf = f'translate({p["at"][0]} {p["at"][1]}) rotate({p["r"]}) scale({sx} {sy}) translate({-cx:.1f} {-cy:.1f})'
     doodle = ""
     if p.get("doodle"):
         fx, fy, tx, ty, k = p.get("dfit", (0, 0, 0, 0, 1))
         dtf = f' transform="translate({tx} {ty}) scale({k}) translate({-fx} {-fy})"' if k != 1 else ""
         doodle = f'<g class="doodle"{dtf} style="--sw:{2.3 / s / k:.1f}px">{p["doodle"]}</g>'
     attrs = (f'class="piece" data-id="{p["id"]}"{"" if p["id"] == "lights" else f' data-open="{p["id"]}"'} tabindex="0" role="button" aria-label="{NUMS[p["id"]]} {TITLES.get(p["id"], p["id"])}"'
-             if p["id"] else ('class="piece decor"' if p.get("screens") else 'class="piece decor" aria-hidden="true"'))
+             if p["id"] else ('class="piece decor"' if p.get("screens") else f'class="piece decor {p.get("cls", "")}" aria-hidden="true" style="--delay:{p.get("delay", 0)}s"'))
     extra = screens_markup() if p.get("screens") else ""
     if p.get("tv"):
         art += tv_markup(i, p["tv"])
@@ -391,6 +397,21 @@ HTML = f'''<!doctype html>
   .piece.on .doodle .fl, .piece:focus-visible .doodle .fl, body.dark .piece[data-id="lights"] .doodle .fl {{ transform:scale(1); }}
   .piece.on .doodle .gl, .piece:focus-visible .doodle .gl, body.dark .piece[data-id="lights"] .doodle .gl {{ opacity:1; }}
   body:not(.dark) .piece:not(.on):not(:focus-visible) .doodle * {{ transition-delay:0s !important; transition-duration:.3s !important; }}
+
+  /* players: drop in from the sky, land with a bounce, then play */
+  .player .lift {{ opacity:0; filter:url(#drop); }}
+  body.ready .player .lift {{ opacity:1; animation:dropin 1.1s cubic-bezier(.45,0,.55,1) var(--delay) both; }}
+  @keyframes dropin {{
+    0%   {{ transform:translateY(-2800px); }}
+    62%  {{ transform:translateY(0) scale(1.04,.92); }}
+    74%  {{ transform:translateY(-46px) scale(.98,1.03); }}
+    86%  {{ transform:translateY(0) scale(1.02,.97); }}
+    100% {{ transform:translateY(0) scale(1); }}
+  }}
+  .player image {{ transform-box:fill-box; transform-origin:50% 100%; animation:play 1.7s ease-in-out infinite alternate; }}
+  .player.p2 image {{ animation-duration:2.3s; animation-delay:-.6s; }}
+  @keyframes play {{ 0% {{ transform:rotate(-2.2deg); }} 55% {{ transform:rotate(1.6deg) translateY(-3px); }} 100% {{ transform:rotate(-.6deg); }} }}
+  @media (prefers-reduced-motion: reduce) {{ body.ready .player .lift, .player image {{ animation:none; }} }}
 
   /* tags */
   .ptag .bg {{ fill:var(--silver); stroke:#0a0a0a; stroke-width:2; filter:url(#drop); }}
@@ -560,6 +581,12 @@ HTML = f'''<!doctype html>
 <script src="panels.js?v={VER_JS}"></script>
 <script>
   const scene = document.getElementById("scene");
+  let lastDrop = Date.now();
+  function redrop() {{
+    if (Date.now() - lastDrop < 4000) return;
+    lastDrop = Date.now();
+    document.querySelectorAll(".player .lift").forEach(l => {{ l.style.animation = "none"; void l.getBoundingClientRect(); l.style.animation = ""; }});
+  }}
   // show the room only once every picture in it has arrived; retry any that fail
   const ready = () => {{
     if (document.body.classList.contains("ready")) return;
@@ -676,6 +703,7 @@ HTML = f'''<!doctype html>
     }});
     const on = () => {{
       scene.classList.add("hovering"); lockOn(el);
+      if (el.dataset.id === "dropin") redrop();
       document.querySelectorAll(`.piece[data-id="${{el.dataset.id}}"]`).forEach(p => p.classList.add("on"));
       document.querySelectorAll(`.ptag[data-for="${{el.dataset.id}}"]`).forEach(n => n.classList.add("on"));
     }};
