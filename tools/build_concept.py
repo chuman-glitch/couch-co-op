@@ -170,7 +170,7 @@ PIECES = [
   dict(id="visit",  src=CRT_CAM,   at=(200,1080),  s=0.36, r=-3, tv=TV_CAM),
   dict(id="program", src=POUF,     at=(990,1195),  s=0.34, r=-1),
   # a clamp lamp hung off the rack: the light switch
-  dict(id="lights", src=LAMP,      at=(1520,300),  s=0.3,  r=0, doodle=lamp_doodle()),
+  dict(id=None,     src=LAMP,      at=(1520,300),  s=0.3,  r=0),
 ]
 
 
@@ -190,7 +190,6 @@ TAGS = [  # numbered as a path: front row L→R, back along the floor R→L, the
   dict(id="visit",      num="06", text="live cam · visit", at=(300,1232), to=(240,1215), rot=0),
   dict(id="publishers", num="07", text="for publishers", at=(1250,600),  to=(1015,620),  rot=0, dot=(930,690)),
   dict(id="sidescreen", num="08", text="side screen",    at=(1250,380),  to=(1040,360),  rot=0, dot=(760,590)),
-  dict(id="lights",     num="09", text="lamp on / off",  at=(1640,300),  to=(1600,330),  rot=0, dot=(1585,590)),
 ]
 TITLES = dict(book="Book the room", dropin="Drop in", publishers="For publishers", vision="Our vision", setup="The setup",
               sidescreen="Side screen", program="Program", visit="Visit us")
@@ -317,6 +316,7 @@ HTML = f'''<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Couch Co-Op</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23000080'/%3E%3Crect x='3' y='7' width='10' height='5' fill='%23f1e8d4'/%3E%3Crect x='3' y='4' width='10' height='3' fill='%23c3c3c3'/%3E%3C/svg%3E">
 <meta name="description" content="Couch Co-Op is a public living room for play: cooperative games and interactive art. Pilot edition at POST Houston.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -525,7 +525,7 @@ HTML = f'''<!doctype html>
 <header class="top">
   <a class="logo" href="#">COUCH CO-OP</a>
   <span class="study">Pilot · POST Houston</span>
-  <nav><button class="btn ghost" id="lightsBtn" aria-pressed="false">Lights off</button><button class="btn ghost" data-open="menu" aria-haspopup="dialog">Index</button><button class="btn primary" data-open="book">Book the room</button></nav>
+  <nav><button class="btn ghost" data-open="menu" aria-haspopup="dialog">Index</button><button class="btn primary" data-open="book">Book the room</button></nav>
 </header>
 <div class="loader" aria-hidden="true"><p>LOADING THE LIVING ROOM <span id="loadtxt"></span></p><div class="track"><i id="loadbar"></i></div></div>
 <div class="pan" id="pan">{SCENE}</div>
@@ -584,7 +584,7 @@ HTML = f'''<!doctype html>
     const b = document.getElementById("lightsBtn");
     b.textContent = on ? "Lights on" : "Lights off"; b.setAttribute("aria-pressed", String(on));
   }}
-  document.getElementById("lightsBtn").onclick = toggleLights;
+
 
   // CCTV clock (Houston time) and open-play status
   const fmt = new Intl.DateTimeFormat("en-CA", {{ timeZone:"America/Chicago", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false }});
