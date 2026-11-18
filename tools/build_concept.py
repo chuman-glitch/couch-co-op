@@ -319,7 +319,9 @@ HTML = f'''<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Couch Co-Op</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23000080'/%3E%3Crect x='3' y='7' width='10' height='5' fill='%23f1e8d4'/%3E%3Crect x='3' y='4' width='10' height='3' fill='%23c3c3c3'/%3E%3C/svg%3E">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-64.png" sizes="64x64" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="description" content="Couch Co-Op is a public living room for play: cooperative games and interactive art. Pilot edition at POST Houston.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -466,6 +468,7 @@ HTML = f'''<!doctype html>
 
   /* frame UI */
   .top {{ position:fixed; inset:0 0 auto; z-index:10; display:flex; align-items:center; padding:24px clamp(20px,3vw,44px); gap:20px; }}
+  .logo .mark {{ width:1.05em; height:1.05em; image-rendering:pixelated; vertical-align:-.16em; margin-right:.3em; }}
   .logo {{ font:400 34px/1 VT323, monospace; letter-spacing:1px; color:var(--paper); text-decoration:none; }}
   .top nav {{ margin-left:auto; display:flex; gap:8px; }}
   .btn {{ border:0; }}
@@ -526,7 +529,7 @@ HTML = f'''<!doctype html>
 </head>
 <body>
 <header class="top">
-  <a class="logo" href="#">COUCH CO-OP</a>
+  <a class="logo" href="#"><img class="mark" src="favicon.svg" alt="" width="26" height="26">COUCH CO-OP</a>
   <span class="study">Pilot · POST Houston</span>
   <nav><button class="btn ghost" data-open="menu" aria-haspopup="dialog">Index</button><button class="btn primary" data-open="book">Book the room</button></nav>
 </header>
