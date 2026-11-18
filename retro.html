@@ -515,8 +515,12 @@
     const t = TIPS[id];
     if (t) {
       tip.innerHTML = `<b>${t[0]}</b>${t[1]}`;
-      const tw = 260, left = Math.min(innerWidth - tw - 12, Math.max(12, x1 - 60));
-      Object.assign(tip.style, { left:left + "px", top:Math.min(innerHeight - 90, y0 + 18) + "px" });
+      // sit outside the highlighted object: above it if there's room, otherwise below, never on top of it
+      const th = tip.offsetHeight || 70, tw = tip.offsetWidth || 240, gap = 14;
+      const left = Math.min(innerWidth - tw - 12, Math.max(12, x0 - 8));
+      let top = y0 - 8 - gap - th;
+      if (top < 70) top = Math.min(innerHeight - th - 12, y1 + 8 + gap);
+      Object.assign(tip.style, { left:left + "px", top:top + "px" });
       tip.classList.add("on");
     }
   }
