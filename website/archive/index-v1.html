@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Couch Co-Op</title>
+<meta name="description" content="Couch Co-Op is a public living room for play: cooperative games and interactive art. Pilot edition at POST Houston.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@800;900&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="#" aria-label="Couch Co-Op home">COUCH CO-OP</a>
+  <nav class="topnav">
+    <button class="btn ghost lights" id="lightsBtn" aria-pressed="false">Lights off</button>
+    <button class="btn ghost" data-open="menu" aria-haspopup="dialog">Index</button>
+    <button class="btn" data-open="book">Book the room</button>
+  </nav>
+</header>
+
+<main class="stage" id="stage">
+  <div class="scene-scroll" id="sceneScroll">
+    <div class="frame" id="frame">
+      <svg class="scene" id="scene" viewBox="0 220 900 900" role="group" aria-label="A living room for play. The blue cut-outs and marked objects open each section." preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <radialGradient id="gWarm"><stop offset="0" stop-color="#ffcc66" stop-opacity=".9"/><stop offset=".5" stop-color="#ffaa33" stop-opacity=".25"/><stop offset="1" stop-color="#ffaa33" stop-opacity="0"/></radialGradient>
+        </defs>
+
+        <image href="images/key-room.jpg" x="0" y="220" width="900" height="900" preserveAspectRatio="none"/>
+
+        <!-- lights off -->
+        <rect id="veil" x="0" y="220" width="900" height="900" fill="#05040a" opacity="0" pointer-events="none"/>
+        <g id="nightglow" pointer-events="none">
+          <ellipse cx="522" cy="560" rx="300" ry="260" fill="url(#gWarm)" opacity=".55"/>
+          <ellipse cx="160" cy="830" rx="90" ry="20" fill="#7fb2ff" opacity=".35"/>
+        </g>
+
+        <!-- 03 · the light panel becomes the screen -->
+        <g class="hot cut screen" id="hs-main" data-panel="publishers" data-num="03" data-label="For publishers" data-sub="Your game here" tabindex="0" role="button" aria-label="The light panel: for publishers. Your game here.">
+          <polygon class="shape" points="331,471 663,419 713,501 451,533"/>
+          <g transform="translate(522 476) rotate(-8.6) skewX(18)">
+            <text class="screen-kicker" x="0" y="-10" text-anchor="middle">FEATURED SCREEN</text>
+            <text class="screen-title" x="0" y="12" text-anchor="middle">YOUR GAME HERE</text>
+            <text class="screen-press" x="0" y="28" text-anchor="middle">▶ PRESS START</text>
+          </g>
+          <polygon class="hit" points="325,466 665,412 720,503 450,540"/>
+        </g>
+
+        <!-- 07 · speaker -->
+        <g class="hot obj" id="hs-program" data-panel="program" data-num="07" data-label="Program" data-sub="Nights, launches, talks" tabindex="0" role="button" aria-label="The speaker: the program">
+          <polygon class="shape" points="231,237 307,240 309,321 233,317"/>
+          <polygon class="hit" points="225,231 313,234 315,327 227,323"/>
+        </g>
+
+        <!-- 08 · the wall and doors -->
+        <g class="hot obj" id="hs-door" data-panel="visit" data-num="08" data-label="Visit us" data-sub="POST Houston" tabindex="0" role="button" aria-label="The doors: how to find us at POST Houston">
+          <polygon class="shape" points="2,492 184,530 184,842 2,858"/>
+          <polygon class="hit" points="2,492 184,530 184,842 2,858"/>
+        </g>
+
+        <!-- 04 · shoes off, printed on the floor -->
+        <g class="hot obj" id="hs-shoes" data-panel="vision" data-num="04" data-label="Shoes off" data-sub="Our vision" tabindex="0" role="button" aria-label="The floor notice: shoes off. Our vision">
+          <polygon class="shape" points="210,1056 552,1084 550,1114 208,1086"/>
+          <polygon class="hit" points="204,1046 558,1076 556,1124 202,1094"/>
+        </g>
+
+        <!-- 01 · the friends in the back -->
+        <g class="hot cut" id="hs-book" data-panel="book" data-num="01" data-label="Book the room" data-sub="Your group, $15 / 2 hours" tabindex="0" role="button" aria-label="Friends at the back: book the room for your group">
+          <path class="shape" d="M322 800 L335 792 L350 796 L360 806 L372 796 L388 790 L398 800 L410 812 L420 800 L432 790 L446 792 L456 804 L462 820 L470 835 L470 848 L440 852 L410 852 L380 856 L355 856 L336 850 L322 840 L320 820Z"/>
+          <path class="hit" d="M322 800 L335 792 L350 796 L360 806 L372 796 L388 790 L398 800 L410 812 L420 800 L432 790 L446 792 L456 804 L462 820 L470 835 L470 848 L440 852 L410 852 L380 856 L355 856 L336 850 L322 840 L320 820Z"/>
+        </g>
+
+        <!-- 05 · cushions -->
+        <g class="hot obj" id="hs-console" data-panel="setup" data-num="05" data-label="The setup" data-sub="Cushions for 4–6 players" tabindex="0" role="button" aria-label="Floor cushions: how the room is set up">
+          <path class="shape" d="M488 890 L500 872 L540 866 L590 868 L612 878 L610 900 L580 910 L530 912 L495 908Z"/>
+          <path class="shape" d="M410 955 L420 940 L450 932 L500 928 L560 925 L600 928 L615 940 L610 962 L580 975 L530 982 L470 985 L430 980 L410 970Z"/>
+          <path class="hit" d="M488 890 L500 872 L540 866 L590 868 L612 878 L610 900 L580 910 L530 912 L495 908Z M410 955 L420 940 L450 932 L500 928 L560 925 L600 928 L615 940 L610 962 L580 975 L530 982 L470 985 L430 980 L410 970Z"/>
+        </g>
+
+        <!-- 09 · the big cushion: lights -->
+        <g class="hot obj" id="hs-lamp" data-action="lights" data-num="09" data-label="Lights off" data-sub="Lie back, dim the room" tabindex="0" role="button" aria-label="The big cushion: switch the lights" aria-pressed="false">
+          <path class="shape" d="M752 905 L770 878 L800 862 L840 855 L880 858 L900 868 L900 1012 L860 1019 L800 1016 L740 1006 L700 996 L682 982 L690 962 L718 952 L742 938Z"/>
+          <path class="hit" d="M752 905 L770 878 L800 862 L840 855 L880 858 L900 868 L900 1012 L860 1019 L800 1016 L740 1006 L700 996 L682 982 L690 962 L718 952 L742 938Z"/>
+        </g>
+
+        <!-- 06 · the one on her phone -->
+        <g class="hot cut" id="hs-side" data-panel="sidescreen" data-num="06" data-label="Side screen" data-sub="More to play" tabindex="0" role="button" aria-label="A visitor on her phone: the side screen">
+          <path class="shape" d="M600 880 L612 858 L625 840 L645 834 L662 840 L672 848 L690 846 L705 860 L720 885 L740 915 L752 940 L748 958 L720 962 L690 962 L660 975 L630 985 L600 985 L588 972 L590 950 L598 930 L596 905Z"/>
+          <path class="hit" d="M600 880 L612 858 L625 840 L645 834 L662 840 L672 848 L690 846 L705 860 L720 885 L740 915 L752 940 L748 958 L720 962 L690 962 L660 975 L630 985 L600 985 L588 972 L590 950 L598 930 L596 905Z"/>
+        </g>
+
+        <!-- 02 · lying down, shoes off -->
+        <g class="hot cut" id="hs-couch" data-panel="dropin" data-num="02" data-label="Drop in" data-sub="Free play, 10am – 10pm" tabindex="0" role="button" aria-label="Someone lying on the cushions: drop in and play for free">
+          <path class="shape" d="M150 940 L160 925 L185 915 L200 905 L225 890 L240 875 L258 862 L285 855 L305 858 L322 846 L345 842 L362 850 L372 870 L370 890 L350 900 L330 905 L300 915 L270 925 L250 945 L220 950 L185 950 L155 952Z"/>
+          <path class="hit" d="M150 940 L160 925 L185 915 L200 905 L225 890 L240 875 L258 862 L285 855 L305 858 L322 846 L345 842 L362 850 L372 870 L370 890 L350 900 L330 905 L300 915 L270 925 L250 945 L220 950 L185 950 L155 952Z"/>
+        </g>
+
+        <g id="markers" aria-hidden="true"></g>
+      </svg>
+    </div>
+  </div>
+
+  <section class="copy">
+    <p class="kicker-line">Pilot edition · POST Houston</p>
+    <h1 class="statement">A public living room <em>for play.</em></h1>
+    <p class="intro">Co-op games and interactive art on floor cushions. Free to drop in, 10am – 10pm. Shoes off at the door.</p>
+    <ol class="index" id="index"></ol>
+  </section>
+
+  <div class="tag" id="tag" aria-hidden="true"><span class="tag-num"></span><span class="tag-label"></span><span class="tag-sub"></span></div>
+</main>
+
+<!-- ===== PHONE: turn sideways start screen ===== -->
+<div class="rotate" id="rotate" aria-live="polite">
+  <div class="rotate-inner">
+    <p class="rotate-logo">COUCH CO-OP</p>
+    <div class="phone" aria-hidden="true"><div class="phone-screen"></div></div>
+    <p class="rotate-title">Turn your phone <em>sideways</em></p>
+    <p class="rotate-sub">to step into the living room</p>
+    <p class="press">▶ PRESS START</p>
+    <button class="rotate-skip" id="rotateSkip">Stay upright instead</button>
+  </div>
+</div>
+
+<!-- ===== OVERLAY WINDOW ===== -->
+<div class="overlay" id="overlay" hidden>
+  <div class="backdrop" data-close></div>
+  <section class="window" role="dialog" aria-modal="true" aria-labelledby="winTitle" tabindex="-1">
+    <header class="winbar">
+      <span class="winnum" id="winNum"></span>
+      <h2 id="winTitle">—</h2>
+      <button class="close" data-close aria-label="Close">Close ✕</button>
+    </header>
+    <div class="winbody" id="winBody"></div>
+  </section>
+</div>
+
+<!-- ===== PANEL CONTENT (edit copy here) ===== -->
+<template id="panel-vision" data-title="Our vision">
+  <p class="kicker">…a public living room for play…</p>
+  <h3 class="display">Shoes off. <em>Settle in.</em></h3>
+  <p class="lead">Couch Co-Op is a third space where people come together through cooperative games, interactive art, and cultural experiences.</p>
+  <ul class="ticks">
+    <li>Couches everywhere</li>
+    <li>Shoes off at the door</li>
+    <li>Room to sprawl on the floor</li>
+  </ul>
+  <figure class="pic"><img src="images/detail-lounge.jpg" alt="People lounging on large floor cushions in a warm, amber-lit room"></figure>
+  <h4>Not every game is about winning</h4>
+  <p>We focus on cooperative experiences that encourage communication, collaboration, and shared discovery. Some invite you to play. Others leave room to watch, relax, or start a conversation.</p>
+  <h4>Two phases</h4>
+  <div class="phases">
+    <div><span class="chip">Now · Phase 1</span><p>A pop-up living room inside POST Houston: one scaffold-and-curtain structure, two consoles, room for 4–6 players. We're testing the model.</p></div>
+    <div><span class="chip blue">Next · Phase 2</span><p>A permanent home for games and interactive art, with rotating exhibitions, workshops, and a full cultural program.</p></div>
+  </div>
+  <p class="small">An initiative by Nōvo Collective.</p>
+</template>
+
+<template id="panel-featured" data-title="Featured screen">
+  <p class="kicker">The big screen</p>
+  <h3 class="display">Now <em>featuring</em></h3>
+  <p class="lead">The main screen hosts the featured co-op game. Grab a controller, sink into a pouf and play with friends or someone you just met.</p>
+  <div class="feature-card">
+    <div class="feature-art"><span>Coming soon</span></div>
+    <div>
+      <h4 class="nomargin">The first featured title will be announced soon.</h4>
+      <p class="small">Want your game on this screen? <button class="link" data-open="publishers">See publisher packages →</button></p>
+    </div>
+  </div>
+</template>
+
+<template id="panel-sidescreen" data-title="Side screen">
+  <p class="kicker">The small screen</p>
+  <h3 class="display">Also <em>playing</em></h3>
+  <p class="lead">A second, smaller setup for more experiences: indie co-op, experimental games, and interactive art to try between rounds.</p>
+  <div class="lineup">
+    <div class="slot"><span>01</span>Indie co-op pick · TBA</div>
+    <div class="slot"><span>02</span>Interactive art piece · TBA</div>
+    <div class="slot"><span>03</span>Experimental game · TBA</div>
+  </div>
+  <p class="small">The lineup rotates through the pilot.</p>
+</template>
+
+<template id="panel-setup" data-title="The setup">
+  <p class="kicker">How the room works</p>
+  <h3 class="display">Two consoles, <em>4–6 players</em></h3>
+  <div class="facts">
+    <div><b>2</b><span>consoles</span></div>
+    <div><b>2</b><span>screens: featured + side</span></div>
+    <div><b>4–6</b><span>people at a time</span></div>
+  </div>
+  <p>The structure is built like a temporary living room: a scaffold frame wrapped in translucent curtains, set inside POST Houston. Open enough to see in, enclosed enough to feel like your own space.</p>
+  <figure class="pic"><img src="images/detail-light.jpg" alt="A glowing ceiling panel over a room of floor cushions"></figure>
+  <div class="two-ways">
+    <button class="way" data-open="dropin"><b>Drop in</b><span>Free open play, 10am – 10pm</span></button>
+    <button class="way" data-open="book"><b>Book it</b><span>The room to yourselves, $15 / 2 hours</span></button>
+  </div>
+</template>
+
+<template id="panel-dropin" data-title="Drop in">
+  <p class="kicker">Open play</p>
+  <h3 class="display">Free to play. <em>Just show up.</em></h3>
+  <p class="lead">The room is open for free play <b>every day, 10am – 10pm</b>. Anyone can walk in, take their shoes off, and join a game. No ticket, no sign-up.</p>
+  <p>When a group books the room, it's private for that time, so check below before you come.</p>
+  <div class="hours" id="openHoursList"></div>
+  <p class="small">Want the couch to yourselves? Book the room: <b>$15 for 2 hours</b>, like a tennis court.</p>
+  <button class="btn" data-open="book">Book the room</button>
+</template>
+
+<template id="panel-program" data-title="Program">
+  <p class="kicker">An evolving cultural program</p>
+  <h3 class="display">What's <em>on</em></h3>
+  <div class="program">
+    <div><span class="chip">Pilot</span><h4>Publisher showcase</h4><p>Featured co-op titles in rotation on the main screen.</p></div>
+    <div><span class="chip">Pilot</span><h4>Co-op nights</h4><p>Hosted play nights and friendly co-op challenges.</p></div>
+    <div><span class="chip">Pilot</span><h4>Game launches &amp; previews</h4><p>First looks and early access, in a living room.</p></div>
+    <div><span class="chip blue">Phase 2</span><h4>Exhibitions &amp; installations</h4><p>Rotating exhibitions and long-term interactive work.</p></div>
+    <div><span class="chip blue">Phase 2</span><h4>Workshops &amp; labs</h4><p>Artist-led workshops, creative labs, developer talks.</p></div>
+    <div><span class="chip blue">Phase 2</span><h4>Talks &amp; screenings</h4><p>Performances, screenings and cultural gatherings.</p></div>
+  </div>
+  <p class="small">Dates will be posted here as the pilot is scheduled.</p>
+</template>
+
+<template id="panel-publishers" data-title="For publishers">
+  <p class="kicker">Publisher showcase</p>
+  <h3 class="display">Put your game <em>in the room</em></h3>
+  <p class="lead">Couch Co-Op creates a physical setting for games to reach audiences beyond traditional gaming channels. Your game, played by real groups on real couches, inside one of Houston's busiest cultural venues.</p>
+  <div class="facts">
+    <div><b>Audience</b><span>discovery</span></div>
+    <div><b>Experiential</b><span>campaigns</span></div>
+    <div><b>Engagement</b><span>&amp; visibility</span></div>
+  </div>
+  <div class="packages">
+    <article class="pkg">
+      <p class="chip">Standard placement</p>
+      <p class="price">$3,000</p>
+      <p class="term"><b>10 days</b> of placement, spread over two months</p>
+    </article>
+    <article class="pkg premium">
+      <p class="chip blue">Premium</p>
+      <p class="price">$7,000</p>
+      <p class="term"><b>30 days</b> of placement</p>
+    </article>
+  </div>
+  <p class="small">The room has two displays: one main screen for featured games and one smaller screen for more experiences. Tell us about your game and we'll plan the placement with you.</p>
+  <a class="btn" id="pubMail" href="#">Request a placement</a>
+</template>
+
+<template id="panel-visit" data-title="Visit us">
+  <p class="kicker">The first edition</p>
+  <h3 class="display">Find us at <em>POST Houston</em></h3>
+  <p class="lead">We're developing the pilot edition of Couch Co-Op in collaboration with POST Houston, the former Barbara Jordan Post Office, now a cultural hub next to the Theater District and Buffalo Bayou.</p>
+  <figure class="pic"><img src="images/post-map.jpg" alt="Map showing POST Houston between the Sawyer Heights neighborhood, the Theater District and Buffalo Bayou"></figure>
+  <p><b>POST Houston</b><br>401 Franklin St, Houston, TX</p>
+  <p class="small">The exact spot inside POST and pilot dates are coming soon. Questions? <a class="mail" href="mailto:hi@novocollective.org">hi@novocollective.org</a></p>
+</template>
+
+<template id="panel-book" data-title="Book the room">
+  <p class="kicker">Like a tennis court, but with couches</p>
+  <h3 class="display">Book <em>the room</em></h3>
+  <p class="lead">Have the living room to yourselves: both consoles, both screens, up to <b><span data-cfg="maxGuests"></span> people</b>. <b>$15 for 2 hours</b>, for the whole room.</p>
+  <form class="booking" id="bookingForm" novalidate>
+    <fieldset>
+      <legend>1 · Day</legend>
+      <div class="days" id="days" role="radiogroup" aria-label="Pick a day"></div>
+    </fieldset>
+    <fieldset>
+      <legend>2 · Time <span class="legend-note">2-hour blocks · tap the next block to stay for 4 hours</span></legend>
+      <div class="slots" id="slots"></div>
+      <div class="key"><span class="k sel"></span>Your booking <span class="k taken"></span>Booked or passed</div>
+    </fieldset>
+    <fieldset class="row">
+      <legend>3 · You</legend>
+      <label>Name<input name="name" autocomplete="name" required></label>
+      <label>Email<input name="email" type="email" autocomplete="email" required></label>
+      <label>Group size<select name="guests" id="guests"></select></label>
+    </fieldset>
+    <div class="summary" id="summary" aria-live="polite">Pick a time block to see your total.</div>
+    <button class="btn wide" type="submit">Request booking</button>
+    <p class="formmsg" id="formMsg" role="status"></p>
+    <p class="small">Outside private bookings, the room is open to everyone for free, 10am – 10pm.</p>
+  </form>
+</template>
+
+<template id="panel-menu" data-title="Index">
+  <p class="kicker">Everything in the room</p>
+  <ul class="menu" id="menuList"></ul>
+</template>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# raw source material (large, and third-party / rights unclear) — kept locally only
+inspo/
+the post/
+website/collage/
+website/concept/cut2-rejects/
+*.HEIC
+*.MOV
+*.mov
+*.pdf
+
+# local tooling
+.claude/
