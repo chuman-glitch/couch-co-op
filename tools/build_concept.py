@@ -171,7 +171,7 @@ PIECES = [
   dict(id="dropin", src=FLOOR_SOFA, at=(640,1050), s=0.7,  r=-2),
   dict(id="book",   src=TOGO,      at=(1300,1060), s=0.52, r=3),
   dict(id="visit",  src=CRT_CAM,   at=(200,1080),  s=0.36, r=-3, tv=TV_CAM),
-  dict(id="program", src=POUF,     at=(990,1195),  s=0.34, r=-1),
+  dict(id=None,     src=POUF,      at=(990,1195),  s=0.34, r=-1),
   # a clamp lamp hung off the rack: the light switch
   dict(id=None,     src=LAMP,      at=(1520,300),  s=0.3,  r=0),
 ]
@@ -607,15 +607,14 @@ HTML = f'''<!doctype html>
   // detection box: locks onto whatever you point at
   const lock = document.getElementById("lock"), tip = document.getElementById("tip");
   const TIPS = {{
-    book:["Reserve the room", "Both consoles, both screens, up to 6 players. 2 hrs · $15."],
-    dropin:["Player 2 has joined.", "Open play is free, 10:00–22:00. Grab a controller."],
-    publishers:["Featured slot open", "Put your game on the main screen. Press START for packages."],
-    vision:["Shoes off.", "House rule #1. Respawn on the rug."],
-    setup:["2 consoles · 2 screens · 6 seats", "Scaffold, steel and CRTs inside POST Houston."],
-    sidescreen:["Also playing", "Small games and interactive art on the second screen."],
-    program:["snacks.exe", "Tournament nights, screenings and snacks. See the program."],
-    visit:["Live from POST Houston", "Find us in the atrium. Open daily."],
-    lights:["Lamp", "Click to switch the room lights."],
+    dropin:["Drop in", "Free open play, daily 10am–10pm. Grab a controller."],
+    book:["Book the room", "Both consoles and screens, up to 6 people. $15 for 2 hours."],
+    program:["Snacks & nights", "Co-op nights, launches and screenings."],
+    vision:["Shoes off", "House rule #1, and what the room is for."],
+    setup:["The setup", "2 consoles, 2 screens, room for 4–6."],
+    visit:["Visit", "Inside POST Houston. Open daily."],
+    publishers:["For publishers", "Feature your game on the main screen."],
+    sidescreen:["Side screen", "Small games and interactive art."],
   }};
   const LABELS = {{ book:"BOOK_THE_ROOM", dropin:"DROP_IN", publishers:"FEATURED_SCREEN", vision:"SHOES_OFF", setup:"THE_SETUP",
     sidescreen:"SIDE_SCREEN", program:"SNACKS_&_NIGHTS", visit:"LIVE_CAM", lights:"LAMP" }};
