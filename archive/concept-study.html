@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Couch Co-Op · design study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@900&family=Instrument+Serif:ital@0;1&family=Caveat:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --night:#14110e; --paper:#f1e8d4; --ink:#2a2420; --cut:#1d37c6; --amber:#f3b23c; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--night); color:var(--paper); overflow:hidden; font-family:"Space Grotesk",system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  body::after { content:""; position:fixed; inset:0; pointer-events:none; z-index:30; opacity:.12; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .scene { position:fixed; inset:0; width:100%; height:100%; display:block; }
+
+  /* cut-outs */
+  .piece { cursor:pointer; outline:none; }
+  .piece.decor { cursor:default; }
+  .piece .lift { transition:transform .35s cubic-bezier(.2,.9,.3,1.3); transform-box:fill-box; transform-origin:center; filter:url(#drop); }
+  .piece image.cut { filter:url(#sticker); }
+  .piece image.flat { opacity:.95; }
+  .piece .paper { fill:var(--paper); stroke:var(--paper); stroke-width:6; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+  .piece:not(.decor):hover .lift, .piece:focus-visible .lift, .piece.on .lift { transform:translateY(-8px) scale(1.03); }
+  .piece.on .lift.low, .piece:hover .lift.low { transform:scale(1.015); }
+  .sticker .blue { fill:var(--cut); stroke:var(--paper); stroke-width:6; vector-effect:non-scaling-stroke; }
+  .sticker:hover .blue, .sticker.on .blue { fill:#2846e6; }
+  .sticker .cordline { fill:none; stroke:#a8977f; stroke-width:1.3; vector-effect:non-scaling-stroke; }
+  .st-k { font-weight:700; font-family:"Space Grotesk"; letter-spacing:3px; fill:var(--paper); opacity:.8; }
+  .st-t { font-family:Unbounded; font-weight:900; fill:var(--paper); }
+
+  /* hand-drawn layers that draw themselves on hover */
+  .doodle { pointer-events:none; }
+  .doodle .ln { fill:none; stroke:var(--paper); stroke-width:var(--sw); stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .55s ease var(--d,0s); }
+  .doodle .ray { stroke:#ffd27a; }
+  .doodle .dtext { font:700 34px Caveat, cursive; fill:var(--amber); opacity:0; transition:opacity .4s ease var(--d); }
+  .piece.on .doodle .dtext { opacity:1; }
+  .doodle .fl { transform:scale(0); transform-box:fill-box; transform-origin:50% 100%; transition:transform .4s cubic-bezier(.3,1.7,.5,1) calc(var(--d,0s) + .6s); }
+  .doodle .f { fill:#ffbf4d; stroke:var(--paper); stroke-width:var(--sw); stroke-linejoin:round; }
+  .doodle .fi { fill:#fff4cf; }
+  .doodle .fl path { transform-box:fill-box; transform-origin:50% 100%; animation:flick 1.3s ease-in-out infinite alternate; }
+  .doodle .fi { animation-duration:.9s !important; }
+  @keyframes flick { 0% { transform:skewX(-5deg) scaleY(.92); } 45% { transform:skewX(4deg) scaleY(1.07); } 100% { transform:skewX(-2deg) scaleY(.97); } }
+  .doodle .gl { opacity:0; mix-blend-mode:screen; transition:opacity .7s ease calc(var(--d,0s) + .7s); }
+  .doodle .hrt { fill:#e8735a; stroke:var(--paper); stroke-width:calc(var(--sw) * .6); opacity:0; transform-box:fill-box; transform-origin:center; }
+  .piece.on .doodle .hrt, .piece:focus-visible .doodle .hrt { animation:floatUp 2.4s ease-out var(--d) infinite; }
+  @keyframes floatUp { 0% { opacity:0; transform:translateY(0) scale(.6); } 20% { opacity:1; transform:translateY(-8px) scale(1); } 100% { opacity:0; transform:translateY(-50px) scale(.9) rotate(12deg); } }
+  .piece.on .doodle .ln, .piece:focus-visible .doodle .ln, body.dark .piece[data-id="lights"] .doodle .ln { stroke-dashoffset:0; }
+  .piece.on .doodle .fl, .piece:focus-visible .doodle .fl, body.dark .piece[data-id="lights"] .doodle .fl { transform:scale(1); }
+  .piece.on .doodle .gl, .piece:focus-visible .doodle .gl, body.dark .piece[data-id="lights"] .doodle .gl { opacity:1; }
+  body:not(.dark) .piece:not(.on):not(:focus-visible) .doodle * { transition-delay:0s !important; transition-duration:.3s !important; }
+
+  /* paper tags */
+  .tag rect { fill:var(--paper); filter:url(#drop); }
+  .tag circle { fill:var(--night); }
+  .tag text { font:500 27px Caveat, cursive; fill:var(--ink); }
+  .tag .n { font-weight:700; fill:var(--cut); }
+  .tag .string { fill:none; stroke:#cbbca2; stroke-width:1.2; vector-effect:non-scaling-stroke; opacity:.8; }
+  .tag { transition:opacity .3s; }
+  .scene.hovering .tag { opacity:.35; }
+  .scene.hovering .tag.on { opacity:1; }
+
+  /* lights */
+  #veil, #glows { transition:opacity .8s; }
+  body.dark #veil { opacity:.55; }
+  body.dark #glows { opacity:1; mix-blend-mode:screen; }
+
+  /* frame UI */
+  .top { position:fixed; inset:0 0 auto; z-index:10; display:flex; align-items:center; padding:24px clamp(20px,3vw,44px); gap:20px; }
+  .logo { font:900 24px Unbounded; letter-spacing:-.6px; color:var(--paper); text-decoration:none; }
+  .study { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--amber); }
+  .top nav { margin-left:auto; display:flex; gap:8px; }
+  .btn { border:0; border-radius:2px; padding:11px 18px; font:700 13px "Space Grotesk"; cursor:pointer; background:var(--paper); color:var(--ink); }
+  .btn.ghost { background:#14110e99; color:var(--paper); box-shadow:inset 0 0 0 1px #f1e8d455; }
+  .hero { position:fixed; left:clamp(20px,3vw,44px); top:clamp(88px,12vh,128px); z-index:10; pointer-events:none; max-width:min(560px,40vw); }
+  .hero h1 { margin:0 0 14px; font:400 clamp(42px,5.4vw,88px)/.92 "Instrument Serif",serif; letter-spacing:-1.5px; }
+  .hero em { color:var(--amber); }
+  .hero p { margin:0; font-size:15px; line-height:1.5; color:#f1e8d4b0; max-width:26em; }
+
+  /* placeholder window */
+  .ov { position:fixed; inset:0; z-index:20; display:grid; place-items:center; background:#000c; }
+  .ov[hidden] { display:none; }
+  .card { background:var(--paper); color:var(--ink); width:min(520px,calc(100% - 32px)); padding:30px 32px 34px; position:relative; transform:rotate(-1.2deg); box-shadow:0 30px 80px #000; }
+  .card .n { font:700 11px "Space Grotesk"; letter-spacing:2px; color:var(--cut); }
+  .card h2 { margin:6px 0 10px; font:400 52px/1 "Instrument Serif",serif; }
+  .card p { margin:0; color:#6f675e; }
+  .card button { position:absolute; top:14px; right:16px; border:0; background:none; font:700 12px "Space Grotesk"; letter-spacing:1px; cursor:pointer; }
+
+  @media (max-width:760px) and (orientation:portrait) { .hero h1 { font-size:44px; } .study { display:none; } }
+  @media (max-height:520px) { .hero h1 { font-size:34px; } .hero p { display:none; } .top { padding:12px 16px; } .logo { font-size:16px; } .btn { padding:7px 11px; font-size:11px; } .hero { top:56px; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="#">COUCH CO-OP</a>
+  <span class="study">Design study · placeholder</span>
+  <nav><button class="btn ghost" id="lightsBtn">Lights off</button><button class="btn" data-id="book">Book the room</button></nav>
+</header>
+<svg class="scene" id="scene" viewBox="0 0 2000 1333" preserveAspectRatio="xMidYMax slice" role="group" aria-label="Couch Co-Op: a living room for play, collaged into the POST Houston atrium">
+  <defs>
+    <clipPath id="c9"><path d="M190.0 118.0 L225.0 110.0 L300.0 125.0 L355.0 128.0 L325.0 148.0 L322.0 200.0 L318.0 250.0 L300.0 280.0 L288.0 300.0 L285.0 345.0 L345.0 352.0 L330.0 362.0 L295.0 365.0 L300.0 395.0 L320.0 435.0 L322.0 470.0 L308.0 500.0 L300.0 530.0 L305.0 550.0 L345.0 565.0 L370.0 575.0 L362.0 590.0 L320.0 600.0 L312.0 640.0 L315.0 760.0 L325.0 820.0 L350.0 840.0 L430.0 850.0 L465.0 870.0 L462.0 900.0 L430.0 915.0 L300.0 925.0 L150.0 928.0 L40.0 915.0 L25.0 890.0 L40.0 860.0 L120.0 845.0 L205.0 840.0 L230.0 800.0 L235.0 700.0 L238.0 600.0 L195.0 590.0 L150.0 580.0 L142.0 560.0 L160.0 545.0 L200.0 560.0 L240.0 540.0 L245.0 520.0 L230.0 500.0 L222.0 465.0 L232.0 430.0 L250.0 395.0 L255.0 365.0 L210.0 362.0 L205.0 350.0 L255.0 343.0 L255.0 300.0 L240.0 280.0 L225.0 250.0 L218.0 190.0 L212.0 140.0Z M310.0 512.0 L360.0 505.0 L430.0 515.0 L510.0 512.0 L540.0 522.0 L505.0 540.0 L492.0 560.0 L488.0 610.0 L470.0 650.0 L450.0 680.0 L445.0 700.0 L465.0 740.0 L470.0 790.0 L458.0 830.0 L445.0 860.0 L455.0 900.0 L560.0 920.0 L605.0 940.0 L610.0 975.0 L580.0 1000.0 L450.0 1012.0 L300.0 1010.0 L215.0 995.0 L208.0 960.0 L230.0 935.0 L300.0 915.0 L395.0 900.0 L405.0 860.0 L395.0 835.0 L368.0 810.0 L360.0 760.0 L378.0 725.0 L400.0 700.0 L398.0 670.0 L370.0 640.0 L350.0 590.0 L345.0 545.0 L330.0 530.0Z M685.0 262.0 L720.0 255.0 L790.0 262.0 L845.0 265.0 L875.0 270.0 L845.0 282.0 L840.0 320.0 L830.0 360.0 L805.0 385.0 L795.0 410.0 L805.0 445.0 L820.0 480.0 L810.0 520.0 L795.0 545.0 L790.0 600.0 L830.0 610.0 L870.0 625.0 L865.0 645.0 L830.0 652.0 L810.0 670.0 L812.0 760.0 L825.0 820.0 L860.0 850.0 L950.0 870.0 L985.0 895.0 L980.0 925.0 L940.0 945.0 L800.0 952.0 L660.0 950.0 L600.0 935.0 L560.0 915.0 L570.0 895.0 L620.0 880.0 L710.0 860.0 L740.0 820.0 L750.0 700.0 L752.0 660.0 L715.0 652.0 L682.0 645.0 L680.0 628.0 L720.0 615.0 L760.0 600.0 L758.0 555.0 L742.0 525.0 L728.0 490.0 L738.0 450.0 L752.0 420.0 L750.0 385.0 L730.0 365.0 L718.0 320.0 L712.0 282.0Z"/></clipPath>
+    <filter id="drop" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity=".6"/></filter>
+    <filter id="sticker" x="-10%" y="-10%" width="120%" height="125%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="10" result="grow"/>
+      <feFlood flood-color="#f1e8d4"/><feComposite in2="grow" operator="in" result="edge"/>
+      <feMerge><feMergeNode in="edge"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="glow"><stop offset="0" stop-color="#ffd27a" stop-opacity=".7"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="candleglow"><stop offset="0" stop-color="#ffcf6e" stop-opacity=".75"/><stop offset=".4" stop-color="#ffb347" stop-opacity=".22"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>
+    <radialGradient id="fade" cx=".5" cy=".55" r=".75"><stop offset=".55" stop-color="#14110e" stop-opacity="0"/><stop offset="1" stop-color="#14110e" stop-opacity=".85"/></radialGradient>
+    <linearGradient id="left" x1="0" x2="1"><stop offset=".12" stop-color="#14110e" stop-opacity=".92"/><stop offset=".42" stop-color="#14110e" stop-opacity="0"/></linearGradient>
+    <radialGradient id="pool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffcf8a" stop-opacity=".16"/><stop offset="1" stop-color="#ffcf8a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <image href="concept/backdrop-post.jpg" width="2000" height="1333"/>
+  <rect width="2000" height="1333" fill="url(#fade)"/>
+  <rect width="2000" height="760" fill="url(#left)"/>
+  <ellipse cx="1000" cy="1120" rx="900" ry="260" fill="url(#pool)"/>
+  <rect id="veil" width="2000" height="1333" fill="#000" opacity="0"/>
+  <g id="glows" opacity="0"><circle cx="1800" cy="1080" r="260" fill="url(#glow)"/></g>
+  <g class="piece sticker" data-id="publishers" tabindex="0" role="button" aria-label="03 For publishers"><path class="cordline" d="M868 494 L898 0 M1132 482 L1102 0"/><g class="lift"><polygon class="blue" points="838,492 1162,480 1168,694 844,706"/><g transform="translate(1003 593) rotate(-2)"><text class="st-k" y="-53.0" text-anchor="middle" style="font-size:12.0px">FEATURED SCREEN</text><text class="st-t" y="-7.0" text-anchor="middle" style="font-size:40px">YOUR GAME</text><text class="st-t" y="35.0" text-anchor="middle" style="font-size:40px">HERE</text></g></g></g><g class="piece sticker" data-id="sidescreen" tabindex="0" role="button" aria-label="06 Side screen"><g class="lift"><polygon class="blue" points="1488,690 1630,698 1626,792 1484,786"/><g transform="translate(1557 744) rotate(3)"><text class="st-k" y="-16.0" text-anchor="middle" style="font-size:8.0px">ALSO</text><text class="st-t" y="7.0" text-anchor="middle" style="font-size:20px">PLAYING</text></g></g></g>
+  <g class="piece" data-id="setup" tabindex="0" role="button" aria-label="05 The setup"><g transform="translate(1000 1095) rotate(-2) scale(0.78 0.42900000000000005) translate(-550.0 -334.0)"><g class="lift low"><image class="flat" href="concept/cut/rug-moss.png" width="1100" height="668"/></g></g></g><g class="piece" data-id="vision" tabindex="0" role="button" aria-label="04 Our vision"><g transform="translate(520 1165) rotate(8) scale(0.44 0.24200000000000002) translate(-550.0 -309.5)"><g class="lift low"><image class="flat" href="concept/cut/rug-rose.png" width="1100" height="619"/><g class="doodle" transform="translate(560 300) scale(1.6) translate(-590 -300)" style="--sw:3.3px"><g transform="translate(420 300) rotate(-28)"><path class="ln" pathLength="1" style="--d:0.00s" d="M0 -60 C 26 -62 36 -30 34 0 C 32 34 24 58 0 60 C -24 58 -32 34 -34 0 C -36 -30 -26 -62 0 -60 Z"/><path class="ln" pathLength="1" style="--d:0.15s" d="M0 -22 C 14 -22 18 -6 16 10 C 14 24 -14 24 -16 10 C -18 -6 -14 -22 0 -22 Z"/><path class="ln" pathLength="1" style="--d:0.30s" d="M-12 -30 l 24 6 M-12 -40 l 24 6 M12 -30 l -24 6 M12 -40 l -24 6"/><path class="ln" pathLength="1" style="--d:0.40s" d="M-14 -34 c -18 -6 -26 4 -20 14 M14 -34 c 18 -8 30 2 22 14"/></g><g transform="translate(505 330) rotate(12)"><path class="ln" pathLength="1" style="--d:0.20s" d="M0 -60 C 26 -62 36 -30 34 0 C 32 34 24 58 0 60 C -24 58 -32 34 -34 0 C -36 -30 -26 -62 0 -60 Z"/><path class="ln" pathLength="1" style="--d:0.35s" d="M0 -22 C 14 -22 18 -6 16 10 C 14 24 -14 24 -16 10 C -18 -6 -14 -22 0 -22 Z"/><path class="ln" pathLength="1" style="--d:0.50s" d="M-12 -30 l 24 6 M-12 -40 l 24 6 M12 -30 l -24 6 M12 -40 l -24 6"/><path class="ln" pathLength="1" style="--d:0.60s" d="M-14 -34 c -18 -6 -26 4 -20 14 M14 -34 c 18 -8 30 2 22 14"/></g><g transform="translate(700 250) rotate(40)"><path class="ln" pathLength="1" style="--d:0.50s" d="M0 -52 C 22 -52 28 -24 26 2 C 24 32 18 50 0 52 C -18 50 -24 32 -26 2 C -28 -24 -22 -52 0 -52 Z"/><path class="ln" pathLength="1" style="--d:0.65s" d="M-28 -18 C -14 -28 14 -28 28 -18 M-28 -6 C -14 -16 14 -16 28 -6"/></g><g transform="translate(760 300) rotate(64)"><path class="ln" pathLength="1" style="--d:0.65s" d="M0 -52 C 22 -52 28 -24 26 2 C 24 32 18 50 0 52 C -18 50 -24 32 -26 2 C -28 -24 -22 -52 0 -52 Z"/><path class="ln" pathLength="1" style="--d:0.80s" d="M-28 -18 C -14 -28 14 -28 28 -18 M-28 -6 C -14 -16 14 -16 28 -6"/></g><path class="ln" pathLength="1" style="--d:0.90s" d="M300 420 q 40 -20 80 0 t 80 0"/></g></g></g></g><g class="piece decor" aria-hidden="true"><g transform="translate(1500 1160) rotate(-6) scale(0.42 0.231) translate(-550.0 -351.5)"><g class="lift low"><image class="flat" href="concept/cut/rug-olive.png" width="1100" height="703"/></g></g></g><g class="piece" data-id="visit" tabindex="0" role="button" aria-label="08 Visit us"><g transform="translate(310 965) rotate(0) scale(0.4 0.4) translate(-366.5 -550.0)"><g class="lift"><image class="cut" href="concept/cut/fig.png" width="733" height="1100"/></g></g></g><g class="piece" data-id="dropin" tabindex="0" role="button" aria-label="02 Drop in"><g transform="translate(720 980) rotate(-2) scale(0.47 0.47) translate(-550.0 -292.0)"><g class="lift"><image class="cut" href="concept/cut/loveseat.png" width="1100" height="584"/><g class="doodle" transform="translate(560 285) scale(1.15) translate(-560 -300)" style="--sw:4.3px"><path class="ln" pathLength="1" style="--d:0.00s" d="M392 132 C 362 130 352 166 372 184 C 392 200 424 190 428 162 C 430 140 414 128 392 132"/><path class="ln" pathLength="1" style="--d:0.12s" d="M366 150 c 10 -22 40 -30 62 -10 M372 140 c 6 -10 18 -14 28 -10"/><path class="ln" pathLength="1" style="--d:0.18s" d="M386 160 l 0 4 M408 158 l 0 4 M392 176 q 8 4 14 -2"/><path class="ln" pathLength="1" style="--d:0.28s" d="M372 196 C 360 230 362 272 372 302 M424 194 C 438 228 440 270 432 302"/><path class="ln" pathLength="1" style="--d:0.45s" d="M370 206 C 360 236 372 262 396 270 M428 206 C 444 238 432 262 414 270"/><path class="ln" pathLength="1" style="--d:0.62s" d="M392 262 c 0 -8 8 -11 14 -9 l 10 0 c 8 -2 14 4 12 12 c -2 8 -8 8 -12 4 l -8 0 c -6 6 -14 4 -16 -7 z"/><path class="ln" pathLength="1" style="--d:0.70s" d="M374 302 C 360 330 352 350 356 372 L 352 470 l -22 8 M430 302 C 440 330 446 350 444 372 L 450 470 l 24 6"/><path class="ln" pathLength="1" style="--d:0.35s" d="M712 118 C 682 116 672 152 692 170 C 712 186 744 176 748 148 C 750 126 734 114 712 118"/><path class="ln" pathLength="1" style="--d:0.45s" d="M690 128 q 14 -18 40 -12 q 14 4 18 18"/><path class="ln" pathLength="1" style="--d:0.50s" d="M704 146 l 0 4 M728 144 l 0 4 M708 160 C 712 172 728 172 732 158 Z"/><path class="ln" pathLength="1" style="--d:0.60s" d="M694 182 C 684 220 686 262 696 300 M744 180 C 756 216 758 260 750 300"/><path class="ln" pathLength="1" style="--d:0.75s" d="M694 192 C 670 168 660 132 668 100 M744 190 C 770 166 784 130 780 96"/><path class="ln" pathLength="1" style="--d:0.92s" d="M762 92 c 0 -8 8 -11 14 -9 l 10 0 c 8 -2 14 4 12 12 c -2 8 -8 8 -12 4 l -8 0 c -6 6 -14 4 -16 -7 z"/><path class="ln" pathLength="1" style="--d:0.95s" d="M698 300 C 688 330 682 352 686 374 L 682 470 l -22 8 M748 300 C 758 330 764 352 762 374 L 768 470 l 24 6"/><path class="ln" pathLength="1" style="--d:1.10s" d="M806 60 l 10 -26 M828 72 l 22 -18 M836 100 l 26 -4"/><path class="ln" pathLength="1" style="--d:1.15s" d="M650 70 l -12 -20 M634 96 l -24 -8"/><path class="ln" pathLength="1" style="--d:1.20s" d="M540 120 l 8 -16 l 8 16 l 8 -16 l 8 16"/><path class="ln" pathLength="1" style="--d:1.30s" d="M548 74 C 548 50 600 46 604 70 C 608 92 566 96 556 92 L 540 104 L 548 86 C 544 82 546 78 548 74"/><text class="dtext" x="560" y="80" style="--d:1.4s">GG!</text></g></g></g></g><g class="piece" data-id="book" tabindex="0" role="button" aria-label="01 Book the room"><g transform="translate(1290 975) rotate(3) scale(0.48 0.48) translate(-550.0 -275.0)"><g class="lift"><image class="cut" href="concept/cut/sofa-green.png" width="1100" height="550"/></g></g></g><g class="piece" data-id="book" tabindex="0" role="button" aria-label="01 Book the room"><g transform="translate(1255 925) rotate(-2) scale(0.34 0.34) translate(-450.0 -300.5)"><g class="lift"><image class="cut" href="concept/cut/person-phone.png" width="900" height="601"/></g></g></g><g class="piece decor" aria-hidden="true"><g transform="translate(1650 1045) rotate(0) scale(0.3 0.3) translate(-550.0 -366.5)"><g class="lift"><image class="cut" href="concept/cut/table-oxblood.png" width="1100" height="733"/></g></g></g><g class="piece" data-id="program" tabindex="0" role="button" aria-label="07 Program"><g transform="translate(1000 1112) rotate(-1) scale(0.38 0.38) translate(-550.0 -275.0)"><g class="lift"><image class="cut" href="concept/cut/coffee-table.png" width="1100" height="550"/><g class="doodle" transform="translate(555 112) scale(1.35) translate(-560 -120)" style="--sw:4.5px"><path class="ln" pathLength="1" style="--d:0.00s" d="M190 140 C 196 182 330 186 336 140"/><path class="ln" pathLength="1" style="--d:0.10s" d="M188 140 C 200 126 326 124 338 140 C 326 152 200 152 188 140"/><path class="ln" pathLength="1" style="--d:0.30s" d="M215 134 l 14 -18 l 12 20 z"/><path class="ln" pathLength="1" style="--d:0.36s" d="M245 124 l 14 -18 l 12 20 z"/><path class="ln" pathLength="1" style="--d:0.42s" d="M276 128 l 14 -18 l 12 20 z"/><path class="ln" pathLength="1" style="--d:0.48s" d="M304 132 l 14 -18 l 12 20 z"/><path class="ln" pathLength="1" style="--d:0.54s" d="M262 116 l 14 -18 l 12 20 z"/><path class="ln" pathLength="1" style="--d:0.45s" d="M520 128 l 0 -68 M564 128 l 0 -68"/><path class="ln" pathLength="1" style="--d:0.55s" d="M520 60 C 520 48 564 48 564 60 C 564 70 520 70 520 60"/><path class="ln" pathLength="1" style="--d:0.55s" d="M520 128 C 520 137 564 137 564 128"/><path class="ln" pathLength="1" style="--d:0.65s" d="M524 94 l 36 0"/><path class="ln" pathLength="1" style="--d:0.60s" d="M585 118 l 0 -68 M629 118 l 0 -68"/><path class="ln" pathLength="1" style="--d:0.70s" d="M585 50 C 585 38 629 38 629 50 C 629 60 585 60 585 50"/><path class="ln" pathLength="1" style="--d:0.70s" d="M585 118 C 585 127 629 127 629 118"/><path class="ln" pathLength="1" style="--d:0.80s" d="M589 84 l 36 0"/><path class="ln" pathLength="1" style="--d:0.85s" d="M612 50 l 6 -46 l 14 -4"/><path class="ln" pathLength="1" style="--d:0.70s" d="M760 120 L 748 30 L 866 30 L 854 120 Z"/><path class="ln" pathLength="1" style="--d:0.80s" d="M778 120 L 772 30 M806 120 L 806 30 M834 120 L 840 30"/><path class="ln" pathLength="1" style="--d:0.95s" d="M748 30 C 744 4 772 -6 784 8 C 790 -14 822 -14 826 6 C 840 -10 870 2 866 30"/><path class="ln" pathLength="1" style="--d:1.10s" d="M380 168 l 6 3 M410 178 l 5 -2 M690 150 l 4 4"/><path class="ln" pathLength="1" style="--d:1.20s" d="M352 92 l 0 -16 M344 84 l 16 0"/><path class="ln" pathLength="1" style="--d:1.25s" d="M915 64 l 0 -14 M908 57 l 14 0"/></g></g></g></g><g class="piece" data-id="lights" tabindex="0" role="button" aria-label="09 lights"><g transform="translate(1800 1135) rotate(0) scale(0.2 0.2) translate(-505.0 -561.0)"><g class="lift"><path class="paper" d="M190.0 118.0 L225.0 110.0 L300.0 125.0 L355.0 128.0 L325.0 148.0 L322.0 200.0 L318.0 250.0 L300.0 280.0 L288.0 300.0 L285.0 345.0 L345.0 352.0 L330.0 362.0 L295.0 365.0 L300.0 395.0 L320.0 435.0 L322.0 470.0 L308.0 500.0 L300.0 530.0 L305.0 550.0 L345.0 565.0 L370.0 575.0 L362.0 590.0 L320.0 600.0 L312.0 640.0 L315.0 760.0 L325.0 820.0 L350.0 840.0 L430.0 850.0 L465.0 870.0 L462.0 900.0 L430.0 915.0 L300.0 925.0 L150.0 928.0 L40.0 915.0 L25.0 890.0 L40.0 860.0 L120.0 845.0 L205.0 840.0 L230.0 800.0 L235.0 700.0 L238.0 600.0 L195.0 590.0 L150.0 580.0 L142.0 560.0 L160.0 545.0 L200.0 560.0 L240.0 540.0 L245.0 520.0 L230.0 500.0 L222.0 465.0 L232.0 430.0 L250.0 395.0 L255.0 365.0 L210.0 362.0 L205.0 350.0 L255.0 343.0 L255.0 300.0 L240.0 280.0 L225.0 250.0 L218.0 190.0 L212.0 140.0Z M310.0 512.0 L360.0 505.0 L430.0 515.0 L510.0 512.0 L540.0 522.0 L505.0 540.0 L492.0 560.0 L488.0 610.0 L470.0 650.0 L450.0 680.0 L445.0 700.0 L465.0 740.0 L470.0 790.0 L458.0 830.0 L445.0 860.0 L455.0 900.0 L560.0 920.0 L605.0 940.0 L610.0 975.0 L580.0 1000.0 L450.0 1012.0 L300.0 1010.0 L215.0 995.0 L208.0 960.0 L230.0 935.0 L300.0 915.0 L395.0 900.0 L405.0 860.0 L395.0 835.0 L368.0 810.0 L360.0 760.0 L378.0 725.0 L400.0 700.0 L398.0 670.0 L370.0 640.0 L350.0 590.0 L345.0 545.0 L330.0 530.0Z M685.0 262.0 L720.0 255.0 L790.0 262.0 L845.0 265.0 L875.0 270.0 L845.0 282.0 L840.0 320.0 L830.0 360.0 L805.0 385.0 L795.0 410.0 L805.0 445.0 L820.0 480.0 L810.0 520.0 L795.0 545.0 L790.0 600.0 L830.0 610.0 L870.0 625.0 L865.0 645.0 L830.0 652.0 L810.0 670.0 L812.0 760.0 L825.0 820.0 L860.0 850.0 L950.0 870.0 L985.0 895.0 L980.0 925.0 L940.0 945.0 L800.0 952.0 L660.0 950.0 L600.0 935.0 L560.0 915.0 L570.0 895.0 L620.0 880.0 L710.0 860.0 L740.0 820.0 L750.0 700.0 L752.0 660.0 L715.0 652.0 L682.0 645.0 L680.0 628.0 L720.0 615.0 L760.0 600.0 L758.0 555.0 L742.0 525.0 L728.0 490.0 L738.0 450.0 L752.0 420.0 L750.0 385.0 L730.0 365.0 L718.0 320.0 L712.0 282.0Z"/><image href="concept/p-candles.jpg" width="1000" height="1028" clip-path="url(#c9)" preserveAspectRatio="none"/><g class="doodle" style="--sw:11.5px"><circle class="gl" style="--d:0.00s" cx="273" cy="-152" r="190" fill="url(#candleglow)"/><path class="ln" pathLength="1" style="--d:0.00s" d="M257 128 L259 -94 Q261 -103 269 -99 Q276 -90 279 -100 Q285 -104 286 -94 L287 128"/><path class="ln" pathLength="1" style="--d:0.35s" d="M284 -90 q 6 20 -1 38"/><path class="ln" pathLength="1" style="--d:0.45s" d="M272 -100 q -4 -8 1 -16"/><g class="fl" style="--d:0.00s"><path class="f" d="M273 -116 C 251 -130 258 -168 273 -204 C 290 -168 296 -130 273 -116Z"/><path class="fi" d="M273 -120 C 263 -128 266 -148 273 -166 C 281 -148 284 -128 273 -120Z"/></g><path class="ln ray" pathLength="1" style="--d:0.95s" d="M200 -179 L181 -186"/><path class="ln ray" pathLength="1" style="--d:1.00s" d="M228 -216 L209 -244"/><path class="ln ray" pathLength="1" style="--d:1.05s" d="M273 -230 L273 -250"/><path class="ln ray" pathLength="1" style="--d:1.10s" d="M318 -216 L337 -244"/><path class="ln ray" pathLength="1" style="--d:1.15s" d="M346 -179 L365 -186"/><circle class="gl" style="--d:0.18s" cx="426" cy="295" r="190" fill="url(#candleglow)"/><path class="ln" pathLength="1" style="--d:0.18s" d="M408 515 L410 353 Q412 344 422 348 Q429 357 432 347 Q440 343 441 353 L442 515"/><path class="ln" pathLength="1" style="--d:0.53s" d="M439 357 q 6 20 -1 38"/><path class="ln" pathLength="1" style="--d:0.63s" d="M425 347 q -4 -8 1 -16"/><g class="fl" style="--d:0.18s"><path class="f" d="M426 331 C 404 317 411 279 426 243 C 443 279 449 317 426 331Z"/><path class="fi" d="M426 327 C 416 319 419 299 426 281 C 434 299 437 319 426 327Z"/></g><path class="ln ray" pathLength="1" style="--d:1.13s" d="M353 268 L334 261"/><path class="ln ray" pathLength="1" style="--d:1.18s" d="M381 231 L362 203"/><path class="ln ray" pathLength="1" style="--d:1.23s" d="M426 217 L426 197"/><path class="ln ray" pathLength="1" style="--d:1.28s" d="M471 231 L490 203"/><path class="ln ray" pathLength="1" style="--d:1.33s" d="M499 268 L518 261"/><circle class="gl" style="--d:0.36s" cx="781" cy="4" r="190" fill="url(#candleglow)"/><path class="ln" pathLength="1" style="--d:0.36s" d="M765 264 L767 62 Q769 53 777 57 Q784 66 787 56 Q793 52 794 62 L795 264"/><path class="ln" pathLength="1" style="--d:0.71s" d="M792 66 q 6 20 -1 38"/><path class="ln" pathLength="1" style="--d:0.81s" d="M780 56 q -4 -8 1 -16"/><g class="fl" style="--d:0.36s"><path class="f" d="M781 40 C 759 26 766 -12 781 -48 C 798 -12 804 26 781 40Z"/><path class="fi" d="M781 36 C 771 28 774 8 781 -10 C 789 8 792 28 781 36Z"/></g><path class="ln ray" pathLength="1" style="--d:1.31s" d="M708 -23 L689 -30"/><path class="ln ray" pathLength="1" style="--d:1.36s" d="M736 -60 L717 -88"/><path class="ln ray" pathLength="1" style="--d:1.41s" d="M781 -74 L781 -94"/><path class="ln ray" pathLength="1" style="--d:1.46s" d="M826 -60 L845 -88"/><path class="ln ray" pathLength="1" style="--d:1.51s" d="M854 -23 L873 -30"/></g></g></g></g>
+  <g class="tags" aria-hidden="true"><g class="tag" data-for="book"><path class="string" d="M1373 819 Q 1342 862 1310 860"/><g transform="rotate(3 1360 800)"><rect x="1360" y="800" width="202" height="38" rx="2"/><circle cx="1373" cy="819" r="4"/><text x="1386" y="827"><tspan class="n">01</tspan> book the room</text></g></g><g class="tag" data-for="dropin"><path class="string" d="M533 809 Q 586 852 640 850"/><g transform="rotate(-3 520 790)"><rect x="520" y="790" width="215" height="38" rx="2"/><circle cx="533" cy="809" r="4"/><text x="546" y="817"><tspan class="n">02</tspan> drop in · play</text></g></g><g class="tag" data-for="publishers"><path class="string" d="M1208 464 Q 1185 500 1162 492"/><g transform="rotate(3 1195 445)"><rect x="1195" y="445" width="215" height="38" rx="2"/><circle cx="1208" cy="464" r="4"/><text x="1221" y="472"><tspan class="n">03</tspan> for publishers</text></g></g><g class="tag" data-for="vision"><path class="string" d="M313 1234 Q 366 1232 420 1185"/><g transform="rotate(-2 300 1215)"><rect x="300" y="1215" width="152" height="38" rx="2"/><circle cx="313" cy="1234" r="4"/><text x="326" y="1242"><tspan class="n">04</tspan> shoes off</text></g></g><g class="tag" data-for="setup"><path class="string" d="M703 1234 Q 726 1229 750 1180"/><g transform="rotate(2 690 1215)"><rect x="690" y="1215" width="152" height="38" rx="2"/><circle cx="703" cy="1234" r="4"/><text x="716" y="1242"><tspan class="n">05</tspan> the setup</text></g></g><g class="tag" data-for="sidescreen"><path class="string" d="M1663 659 Q 1636 698 1610 694"/><g transform="rotate(-3 1650 640)"><rect x="1650" y="640" width="178" height="38" rx="2"/><circle cx="1663" cy="659" r="4"/><text x="1676" y="667"><tspan class="n">06</tspan> side screen</text></g></g><g class="tag" data-for="program"><path class="string" d="M1108 1224 Q 1089 1219 1070 1170"/><g transform="rotate(-2 1095 1205)"><rect x="1095" y="1205" width="228" height="38" rx="2"/><circle cx="1108" cy="1224" r="4"/><text x="1121" y="1232"><tspan class="n">07</tspan> snacks & nights</text></g></g><g class="tag" data-for="visit"><path class="string" d="M183 734 Q 219 779 255 780"/><g transform="rotate(-3 170 715)"><rect x="170" y="715" width="140" height="38" rx="2"/><circle cx="183" cy="734" r="4"/><text x="196" y="742"><tspan class="n">08</tspan> visit us</text></g></g><g class="tag" data-for="lights"><path class="string" d="M1653 1244 Q 1706 1239 1760 1190"/><g transform="rotate(2 1640 1225)"><rect x="1640" y="1225" width="215" height="38" rx="2"/><circle cx="1653" cy="1244" r="4"/><text x="1666" y="1252"><tspan class="n">09</tspan> light a candle</text></g></g></g>
+</svg>
+<div class="hero"><h1>A public living room <em>for play.</em></h1><p>Co-op games and interactive art at POST Houston. Shoes off, pick a cushion.</p></div>
+<div class="ov" id="ov" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="cardTitle"><button id="close">CLOSE ✕</button><div class="n" id="cardNum"></div><h2 id="cardTitle"></h2><p>Content coming soon. This is a design study: we're settling the look first.</p></div></div>
+<script>
+  const scene = document.getElementById("scene"), ov = document.getElementById("ov");
+  const TITLES = {'book': 'Book the room', 'dropin': 'Drop in', 'publishers': 'For publishers', 'vision': 'Our vision', 'setup': 'The setup', 'sidescreen': 'Side screen', 'program': 'Program', 'visit': 'Visit us'}, NUMS = {'book': '01', 'dropin': '02', 'publishers': '03', 'vision': '04', 'setup': '05', 'sidescreen': '06', 'program': '07', 'visit': '08', 'lights': '09'};
+  function open(id) {
+    if (id === "lights") return toggleLights();
+    document.getElementById("cardNum").textContent = NUMS[id] || "";
+    document.getElementById("cardTitle").textContent = TITLES[id] || id;
+    ov.hidden = false;
+  }
+  function toggleLights() {
+    const on = document.body.classList.toggle("dark");
+    document.getElementById("lightsBtn").textContent = on ? "Lights on" : "Lights off";
+  }
+  document.getElementById("lightsBtn").onclick = toggleLights;
+  document.querySelectorAll("[data-id]").forEach(el => {
+    el.addEventListener("click", () => open(el.dataset.id));
+    el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(el.dataset.id); } });
+    if (!el.classList.contains("piece")) return;
+    el.addEventListener("mouseenter", () => {
+      scene.classList.add("hovering");
+      document.querySelectorAll(`.piece[data-id="${el.dataset.id}"]`).forEach(p => p.classList.add("on"));
+      document.querySelectorAll(`.tag[data-for="${el.dataset.id}"]`).forEach(n => n.classList.add("on"));
+    });
+    el.addEventListener("mouseleave", () => {
+      scene.classList.remove("hovering");
+      document.querySelectorAll(".on").forEach(n => n.classList.remove("on"));
+    });
+  });
+  document.getElementById("close").onclick = () => (ov.hidden = true);
+  ov.addEventListener("click", e => { if (e.target === ov) ov.hidden = true; });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") ov.hidden = true; });
+</script>
+</body>
+</html>
