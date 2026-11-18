@@ -53,14 +53,15 @@ MUSHROOM = Q("lamp-mushroom", 398, 900)
 RACK_F = Q("rack-forest", 569, 900)
 
 # CRT screens inside the cut-outs (cut-out pixels) and the render footage they loop
-TV_BLOCKS = [([(22,148),(168,148),(165,256),(25,256)], ["tv4", "tv1"]),
-             ([(355,48),(545,48),(545,186),(355,186)], ["tv2", "tv6", "tv3"]),
-             ([(667,160),(815,160),(813,262),(668,262)], ["tv5", "tv3"])]
+# rotating: the rack's big screen and the two tower screens. Everything else holds one still.
+TV_BLOCKS = [([(22,148),(168,148),(165,256),(25,256)], ["tv4"]),
+             ([(355,48),(545,48),(545,186),(355,186)], ["tv2"]),
+             ([(667,160),(815,160),(813,262),(668,262)], ["tv3"])]
 TV_STACK = [([(305,20),(410,20),(410,118),(305,118)], ["tv6", "tv4"]),
             ([(318,165),(462,170),(460,325),(318,320)], ["tv1", "tv5"]),
             ([(210,375),(490,375),(490,580),(210,580)], ["tv3", "tv2", "tv6"]),
             ([(337,628),(505,612),(505,855),(337,850)], ["tv4", "tv1"])]
-TV_CAM = [([(196,240),(622,230),(622,632),(200,648)], ["tv5", "tv2"])]
+TV_CAM = [([(196,240),(622,230),(622,632),(200,648)], ["tv5"])]
 TV_RACK = [([(108,140),(498,140),(498,548),(108,548)], ["tv1", "tv3", "tv2", "tv6"])]
 
 def tv_markup(i, screens):
@@ -126,7 +127,7 @@ TOWER_POLY = [(282,0),(609,0),(609,806),(262,806),(262,228),(264,99),(282,90)]
 # the render's two real screens, in the same pixels: (id, corners, angle, slides, kicker, lines, size)
 SCREENS = [
   ("publishers", [(279,316),(426,277),(429,468),(280,474)], -14, ["slide1", "slide2", "slide3"], "FEATURED SCREEN", ["YOUR GAME", "HERE"], 16),
-  ("sidescreen", [(271,98),(435,38),(457,196),(293,229)], -20, ["slide4"], "ALSO", ["PLAYING"], 22),
+  ("sidescreen", [(271,98),(435,38),(457,196),(293,229)], -20, ["slide4", "slide5"], "ALSO", ["PLAYING"], 22),
 ]
 
 def screens_markup():
@@ -138,7 +139,7 @@ def screens_markup():
         poly = " ".join(f"{x},{y}" for x, y in pts)
         n = len(slides); period = 3 * n
         imgs = "".join(
-            f'<image{' class="slide"' if n > 1 else ""} style="animation-duration:{period}s;animation-delay:{-(period - 3 * j) % period}s" '
+            f'<image{' class="slide"' if n > 1 and j else ""} style="animation-duration:{period}s;animation-delay:{-(period - 3 * j) % period}s" '
             f'href="concept/render/{sl}.jpg" x="{x0}" y="{y0}" width="{w}" height="{h}" preserveAspectRatio="xMidYMid slice"/>'
             for j, sl in enumerate(slides))
         lh = size * 1.05
