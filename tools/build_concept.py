@@ -684,3 +684,107 @@ HTML = f'''<!doctype html>
 
 open(OUT, "w").write(HTML)
 print("wrote", OUT)
+
+# ===================== quiet variant (website/quiet.html) =====================
+# Same room, no OS costume: one type family (IBM Plex), flat panels, plain labels,
+# no CCTV readout / scanlines / pixel cursor. Kept: collage, CRT footage, numbered
+# chips, corner brackets, and the navy "selected text" highlight on "for play.".
+QUIET_CSS = """
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style id="quiet">
+  :root { --q-ink:#f1e8d4; --q-dim:#f1e8d48c; --q-line:#f1e8d433; --q-bg:#14110e; --mono:"IBM Plex Mono", ui-monospace, monospace; --sans:"IBM Plex Sans", system-ui, sans-serif; }
+  html, body, .piece.decor, .piece, .screen, button, a, .ptag { cursor:auto; }
+  .piece:not(.decor), .screen, button, a, .ptag .card, .ptag .dot { cursor:pointer; }
+  body { font-family:var(--sans); }
+  .scan, .grain, .hud.bl { display:none !important; }
+  /* top bar */
+  .logo { font:500 15px/1 var(--mono) !important; letter-spacing:.14em !important; }
+  .logo .mark { width:20px !important; height:20px !important; image-rendering:auto !important; vertical-align:-5px !important; margin-right:10px !important; }
+  .study { font:400 12px var(--mono) !important; letter-spacing:.06em !important; color:var(--q-dim) !important; }
+  .btn, .btn.ghost { font:500 12px/1 var(--mono) !important; letter-spacing:.08em !important; text-transform:uppercase; padding:10px 14px !important;
+    background:transparent !important; color:var(--q-ink) !important; box-shadow:inset 0 0 0 1px var(--q-line) !important; border-radius:0 !important; }
+  .btn:hover { box-shadow:inset 0 0 0 1px var(--q-ink) !important; }
+  .btn.primary { background:var(--q-ink) !important; color:#000 !important; box-shadow:none !important; }
+  /* hero */
+  .hero h1 { font:500 clamp(30px,3.1vw,50px)/1.05 var(--mono) !important; letter-spacing:-.04em !important; text-shadow:0 0 24px #000 !important; }
+  .hero h1 mark { padding:0 .08em; }
+  .hero p { background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important;
+    font:400 14px/1.5 var(--sans) !important; color:var(--q-dim) !important; text-shadow:0 0 12px #000; }
+  /* numbered chips: flat squares, label in plain type */
+  .ptag .bg, .ptag .mini { fill:var(--q-bg) !important; stroke:var(--q-line) !important; stroke-width:1.5 !important; filter:none !important; }
+  .ptag .hi, .ptag .lo { display:none; }
+  .ptag .chip { fill:transparent !important; }
+  .ptag.on .chip { fill:var(--cut) !important; }
+  .ptag .num { font:500 20px var(--mono) !important; fill:var(--q-ink) !important; }
+  .ptag .lbl { font:500 18px var(--mono) !important; letter-spacing:.06em !important; fill:var(--q-ink) !important; }
+  .ptag.on .bg { fill:var(--q-bg) !important; stroke:var(--q-ink) !important; }
+  .ptag .pin { fill:var(--q-ink) !important; stroke:none !important; }
+  .ptag .dot circle { fill:var(--q-bg) !important; stroke:var(--q-ink) !important; stroke-width:1.5 !important; filter:none !important; }
+  .ptag .dot text { font:500 30px var(--mono) !important; fill:var(--q-ink) !important; }
+  /* hover: thin brackets + a plain label */
+  .lock i { border-width:1px !important; width:14px !important; height:14px !important; border-color:var(--q-ink) !important; }
+  .lock.on { animation:none !important; }
+  .tip { background:var(--q-bg) !important; color:var(--q-ink) !important; border:1px solid var(--q-line) !important; box-shadow:none !important;
+    font:400 13px/1.45 var(--sans) !important; padding:10px 12px !important; max-width:240px !important; }
+  .tip b { font:500 11px/1 var(--mono) !important; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px !important; color:var(--q-ink); }
+  .tip::before, .tip::after { display:none !important; }
+  .hud.br { font:400 12px/1 var(--mono) !important; letter-spacing:.06em !important; color:var(--q-ink) !important; text-shadow:none !important; background:var(--q-bg); padding:7px 10px; }
+  .hud .open, .hud .closed { color:var(--q-ink) !important; }
+  /* loader */
+  .loader { font:400 11px/1 var(--mono) !important; letter-spacing:.14em !important; color:var(--q-dim) !important; }
+  .loader .track { height:1px !important; padding:0 !important; background:var(--q-line) !important; box-shadow:none !important; }
+  .loader i { background:var(--q-ink) !important; box-shadow:none !important; }
+  /* screens on the tower */
+  .st-k, .st-t { font-family:var(--mono) !important; }
+
+  /* ---------- windows: flat paper panels ---------- */
+  .window { background:#f3efe6 !important; padding:0 !important; box-shadow:0 40px 120px #000 !important; font-family:var(--sans) !important; color:#141210 !important; }
+  .winbar { background:transparent !important; color:#141210 !important; padding:14px 18px 14px 28px !important; border-bottom:1px solid #1412101f !important; }
+  .winbar h2, .winnum { font:500 11px/1 var(--mono) !important; letter-spacing:.12em !important; text-transform:uppercase !important; color:#141210 !important; }
+  .winnum { color:var(--cut) !important; }
+  .winbar .close { background:none !important; box-shadow:none !important; font:500 11px/1 var(--mono) !important; letter-spacing:.12em !important; color:#141210 !important; padding:8px 0 8px 10px !important; }
+  .winbody { background:transparent !important; box-shadow:none !important; margin:0 !important; padding:28px 32px 34px !important; }
+  .kicker { font:500 11px/1 var(--mono) !important; letter-spacing:.12em !important; color:#14121099 !important; }
+  .display { font:600 clamp(34px,4.6vw,48px)/1.02 var(--sans) !important; letter-spacing:-.03em !important; }
+  .display em { font-style:normal; background:var(--cut); color:#fff; padding:0 .08em; }
+  .lead { font:400 17px/1.5 var(--sans) !important; color:#141210 !important; }
+  .winbody p { font-family:var(--sans); font-size:14px; }
+  .pic { padding:0 !important; box-shadow:none !important; background:none !important; }
+  .grp { border-top:1px solid #1412101f !important; }
+  .grp > h4, .winbody .grp > h4 { font:500 11px/1 var(--mono) !important; letter-spacing:.12em !important; }
+  .facts b, .price, .way b, .day b, .menu .lbl, .ticks, .summary b { font-family:var(--sans) !important; font-weight:600 !important; letter-spacing:-.02em; }
+  .facts b { font-size:32px !important; } .price { font-size:44px !important; } .way b { font-size:22px !important; } .menu .lbl { font-size:24px !important; }
+  .ticks { font:400 15px/1.9 var(--sans) !important; }
+  .day, .hslot, .window .btn, .window .btn.wide, .way { background:#fff !important; color:#141210 !important; box-shadow:inset 0 0 0 1px #14121026 !important; border-radius:0 !important; }
+  .day b { font-size:26px !important; }
+  .day small, .hslot small { font-family:var(--mono) !important; }
+  .day[aria-checked="true"], .hslot.sel { background:var(--cut) !important; color:#fff !important; box-shadow:none !important; }
+  .hslot.taken, .hslot.past { background:transparent !important; color:#14121055 !important; box-shadow:inset 0 0 0 1px #1412100f !important; }
+  .booking input, .booking select { background:#fff !important; box-shadow:inset 0 0 0 1px #14121033 !important; font-family:var(--sans) !important; font-size:14px !important; }
+  .window .btn, .window .btn.wide { font:500 12px/1 var(--mono) !important; letter-spacing:.1em !important; text-transform:uppercase; padding:14px 18px !important; }
+  .window .btn:hover { box-shadow:inset 0 0 0 1px #141210 !important; }
+  .window .btn.wide, .window > .winbody > .btn { background:#141210 !important; color:#f3efe6 !important; box-shadow:none !important; }
+  .summary { background:#141210 !important; color:#f3efe6 !important; font:400 14px/1.5 var(--sans) !important; }
+  .summary b { font-size:22px !important; }
+  .way:nth-child(2) { background:var(--cut) !important; color:#fff !important; box-shadow:none !important; }
+  .pkg.premium { background:var(--cut) !important; }
+  .menu button:hover .lbl { background:none !important; color:var(--cut) !important; }
+  .rotate-title, .rotate-logo { font-family:var(--mono) !important; }
+  @media (max-height:560px) { .hero h1 { font-size:22px !important; } .hero { top:48px !important; } .logo { font-size:12px !important; } }
+</style>
+"""
+QUIET_MARK = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
+              '<rect x="3" y="17" width="26" height="9" rx="2" fill="#000080"/>'
+              '<rect x="1" y="14" width="5" height="12" rx="2" fill="#000080"/><rect x="26" y="14" width="5" height="12" rx="2" fill="#000080"/>'
+              '<path d="M7 17c0-6 4-10 10-10s9 4 9 8c0 2-1 3-3 3H9c-1 0-2-.5-2-1z" fill="#c8894a"/>'
+              '<circle cx="13" cy="12" r="1" fill="#6b3e1c"/><circle cx="20" cy="11" r="1" fill="#6b3e1c"/><circle cx="17" cy="15" r=".9" fill="#6b3e1c"/>'
+              '</svg>\n')
+open(os.path.join(ROOT, "website", "mark-quiet.svg"), "w").write(QUIET_MARK)
+Q = HTML.replace("</head>", QUIET_CSS + "</head>", 1)
+Q = Q.replace('<img class="mark" src="favicon.svg"', '<img class="mark" src="mark-quiet.svg"', 1)
+Q = Q.replace('<link rel="icon" href="favicon.svg" type="image/svg+xml">', '<link rel="icon" href="mark-quiet.svg" type="image/svg+xml">', 1)
+Q = Q.replace("LOADING THE LIVING ROOM", "LOADING", 1)
+Q = Q.replace("'<span class=\"open\">● OPEN NOW</span> · 10–22'", "'<span class=\"open\">Open now</span> · daily 10–22'", 1)
+Q = Q.replace("'<span class=\"closed\">○ CLOSED</span> · OPEN 10–22'", "'<span class=\"closed\">Closed</span> · open daily 10–22'", 1)
+open(os.path.join(ROOT, "website", "quiet.html"), "w").write(Q)
+print("wrote quiet.html")
