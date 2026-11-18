@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Couch Co-Op</title>
+<link rel="icon" href="mark-quiet.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-64.png" sizes="64x64" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="description" content="Couch Co-Op is a public living room for play: cooperative games and interactive art. Pilot edition at POST Houston.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@900&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@500;700&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1795007641">
+<style>
+  :root { --night:#14110e; --paper:#f1e8d4; --ink:#2a2420; --cut:#000080; --amber:#f3b23c; --silver:#c3c3c3; --navy:#000080; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--night); color:var(--paper); overflow:hidden; font-family:"Space Grotesk",system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .collage { position:fixed; inset:0; width:100%; height:100%; display:block; opacity:0; transition:opacity .7s ease; }
+  body.ready .collage { opacity:1; }
+  .loader { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:5; width:min(280px,70vw); text-align:center;
+    font:400 20px/1 VT323, monospace; letter-spacing:1px; color:#f1e8d4b3; transition:opacity .4s; pointer-events:none; }
+  .loader p { margin:0 0 10px; }
+  .loader .track { height:14px; padding:2px; background:#000; box-shadow:inset 1px 1px #808080, inset -1px -1px #f1e8d455; }
+  .loader i { display:block; height:100%; width:0; background:var(--navy); box-shadow:inset 0 0 0 1px #3a4bd8; transition:width .2s steps(4); }
+  body.ready .loader { opacity:0; }
+
+  /* cut-outs */
+  .piece { cursor:pointer; outline:none; }
+  .piece.decor { cursor:default; }
+  .piece .lift { transition:transform .35s cubic-bezier(.2,.9,.3,1.3); transform-box:fill-box; transform-origin:center; filter:url(#drop); }
+  .piece image.cut { }
+  .piece image.flat { opacity:.95; }
+  .piece image.thin { filter:brightness(.85); }
+  .piece .paper { fill:var(--paper); stroke:var(--paper); stroke-width:6; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+  .piece:not(.decor):hover .lift, .piece:focus-visible .lift, .piece.on .lift { transform:translateY(-8px) scale(1.03); }
+  .piece.on .lift.low, .piece:hover .lift.low { transform:scale(1.015); }
+  .sticker .blue { fill:var(--cut); stroke:var(--paper); stroke-width:6; vector-effect:non-scaling-stroke; }
+  .sticker:hover .blue, .sticker.on .blue { fill:#2846e6; }
+  .sticker .cordline { fill:none; stroke:#a8977f; stroke-width:1.3; vector-effect:non-scaling-stroke; }
+  .screen { cursor:pointer; outline:none; }
+  .screen .slide, .tv .slide { opacity:0; animation:slide linear infinite; }
+  .tv image { filter:saturate(1.15) contrast(1.05); }
+  @keyframes slide { 0%, 30% { opacity:1; } 36%, 94% { opacity:0; } 100% { opacity:1; } }
+  .screen .bezel { fill:none; stroke:#0d0c0b; stroke-width:3; vector-effect:non-scaling-stroke; }
+  .screen .flip { opacity:0; transition:opacity .25s; }
+  .screen .blue { fill:var(--cut); }
+  .screen:hover .flip, .screen.on .flip, .screen:focus-visible .flip { opacity:1; }
+  .screen:focus-visible .bezel { stroke:var(--amber); }
+  .piece.decor .lift { cursor:default; }
+  .st-k { font-family:VT323, monospace; letter-spacing:1px; fill:var(--paper); opacity:.8; }
+  .st-t { font-family:VT323, monospace; fill:var(--paper); }
+
+  /* hand-drawn layers that draw themselves on hover */
+  .doodle { pointer-events:none; }
+  .doodle .ln { fill:none; stroke:var(--paper); stroke-width:var(--sw); stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .55s ease var(--d,0s); }
+  .doodle .ray { stroke:#ffd27a; }
+  .doodle .dtext { font:900 30px Unbounded; fill:var(--amber); opacity:0; transition:opacity .4s ease var(--d); }
+  .piece.on .doodle .dtext { opacity:1; }
+  .doodle .fl { transform:scale(0); transform-box:fill-box; transform-origin:50% 100%; transition:transform .4s cubic-bezier(.3,1.7,.5,1) calc(var(--d,0s) + .6s); }
+  .doodle .f { fill:#ffbf4d; stroke:var(--paper); stroke-width:var(--sw); stroke-linejoin:round; }
+  .doodle .fi { fill:#fff4cf; }
+  .doodle .fl path { transform-box:fill-box; transform-origin:50% 100%; animation:flick 1.3s ease-in-out infinite alternate; }
+  .doodle .fi { animation-duration:.9s !important; }
+  @keyframes flick { 0% { transform:skewX(-5deg) scaleY(.92); } 45% { transform:skewX(4deg) scaleY(1.07); } 100% { transform:skewX(-2deg) scaleY(.97); } }
+  .doodle .gl { opacity:0; mix-blend-mode:screen; transition:opacity .7s ease calc(var(--d,0s) + .7s); }
+  .doodle .hrt { fill:#e8735a; stroke:var(--paper); stroke-width:calc(var(--sw) * .6); opacity:0; transform-box:fill-box; transform-origin:center; }
+  .piece.on .doodle .hrt, .piece:focus-visible .doodle .hrt { animation:floatUp 2.4s ease-out var(--d) infinite; }
+  @keyframes floatUp { 0% { opacity:0; transform:translateY(0) scale(.6); } 20% { opacity:1; transform:translateY(-8px) scale(1); } 100% { opacity:0; transform:translateY(-50px) scale(.9) rotate(12deg); } }
+  .piece.on .doodle .ln, .piece:focus-visible .doodle .ln, body.dark .piece[data-id="lights"] .doodle .ln { stroke-dashoffset:0; }
+  .piece.on .doodle .fl, .piece:focus-visible .doodle .fl, body.dark .piece[data-id="lights"] .doodle .fl { transform:scale(1); }
+  .piece.on .doodle .gl, .piece:focus-visible .doodle .gl, body.dark .piece[data-id="lights"] .doodle .gl { opacity:1; }
+  body:not(.dark) .piece:not(.on):not(:focus-visible) .doodle * { transition-delay:0s !important; transition-duration:.3s !important; }
+
+  /* tags */
+  .ptag .bg { fill:var(--silver); stroke:#0a0a0a; stroke-width:2; filter:url(#drop); }
+  .ptag .hi { fill:none; stroke:#fff; stroke-width:3; }
+  .ptag .lo { fill:none; stroke:#6b6b6b; stroke-width:3; }
+  .ptag .chip { fill:var(--navy); }
+  .ptag .num { font:400 30px VT323, monospace; fill:#fff; }
+  .ptag .lbl { font:400 30px VT323, monospace; fill:#000; letter-spacing:.5px; }
+  .ptag .string { fill:none; stroke:var(--paper); stroke-width:1.3; vector-effect:non-scaling-stroke; opacity:.8; }
+  .ptag .pin { fill:var(--paper); stroke:#000; stroke-width:2; }
+  .ptag { transition:opacity .3s; }
+  .collage.hovering .ptag { opacity:.45; }
+  .collage.hovering .ptag.on { opacity:1; }
+  .ptag.on .chip { fill:var(--cut); }
+  /* calm by default: just the number; the label slides out on hover */
+  .ptag .mini { fill:var(--silver); stroke:#0a0a0a; stroke-width:2; filter:url(#drop); }
+  .ptag .full { opacity:0; transition:opacity .15s; }
+  .ptag.on .full { opacity:1; } .ptag.on .mini { opacity:0; }
+  .ptag .string { opacity:.35 !important; } .ptag.on .string { opacity:.9 !important; }
+  .ptags { pointer-events:none; } .ptag .card, .ptag .dot { pointer-events:all; cursor:pointer; }
+  .ptag.on .bg { fill:#dcdcdc; }
+
+  /* ===== internet core: CCTV feed, detection boxes, Win98 chrome ===== */
+  .scan { position:fixed; inset:0; z-index:8; pointer-events:none;
+    background:repeating-linear-gradient(180deg, #0000 0 2px, #0000002e 2px 3px), radial-gradient(ellipse at 50% 55%, #0000 55%, #000a 100%); mix-blend-mode:multiply; }
+  .grain { position:fixed; inset:-50%; z-index:8; pointer-events:none; opacity:.07; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 1s steps(4) infinite; }
+  @keyframes grain { 0% { transform:translate(0,0); } 25% { transform:translate(-3%,2%); } 50% { transform:translate(2%,-3%); } 75% { transform:translate(-2%,-1%); } }
+  .hud { position:fixed; z-index:9; pointer-events:none; font:400 22px/1 VT323, monospace; color:#e9f0e6; letter-spacing:1px; text-shadow:0 0 6px #000, 0 0 2px #000; }
+  .hud.bl { left:clamp(20px,3vw,44px); bottom:22px; display:flex; gap:18px; align-items:center; }
+  .hud.br { right:clamp(20px,3vw,44px); bottom:22px; text-align:right; }
+  .rec { color:#ff3b2f; } .rec::before { content:"●"; margin-right:6px; animation:blink 1.2s steps(2) infinite; }
+  .hud .open, .hud .closed { color:var(--paper); }
+  @keyframes blink { 50% { opacity:0; } }
+  .lock { position:fixed; z-index:9; pointer-events:none; opacity:0; transition:opacity .15s; }
+  .lock.on { opacity:1; }
+  .lock i { position:absolute; width:18px; height:18px; border:2px solid #e9f0e6; filter:drop-shadow(0 0 2px #000); }
+  .lock i:nth-child(1) { left:0; top:0; border-right:0; border-bottom:0; }
+  .lock i:nth-child(2) { right:0; top:0; border-left:0; border-bottom:0; }
+  .lock i:nth-child(3) { left:0; bottom:0; border-right:0; border-top:0; }
+  .lock i:nth-child(4) { right:0; bottom:0; border-left:0; border-top:0; }
+  .lock b { display:none; position:absolute; left:0; top:100%; margin-top:4px; white-space:nowrap; font:400 20px/1 VT323, monospace; background:#e9f0e6; color:#000; padding:2px 6px 1px; }
+  .lock.on { animation:lockin .25s steps(3); }
+  @keyframes lockin { from { transform:scale(1.12); } }
+  /* pixel cursors */
+  html, body, .piece.decor { cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='32' shape-rendering='crispEdges'%3E%3Cpath d='M1 1v23l6-6 4 10 4-2-4-9h8z' fill='%23fff' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E") 1 1, default; }
+  .piece, .screen, button, a, .ptag { cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='30' shape-rendering='crispEdges'%3E%3Cpath d='M8 1h3v10h2V8h3v4h2V10h3v3h2v3h1v7l-2 4v2H9v-3l-6-6v-3h3l2 2z' fill='%23fff' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E") 9 1, pointer; }
+  /* Win98 bevel buttons in the top bar */
+  .btn, .btn.ghost { background:var(--silver); color:#000; border-radius:0; font:400 22px/1 VT323, monospace; padding:7px 14px 6px; letter-spacing:.5px;
+    box-shadow:inset -2px -2px #0a0a0a, inset 2px 2px #fff, inset -4px -4px #808080, inset 4px 4px #dfdfdf; }
+  .btn:active { box-shadow:inset 2px 2px #0a0a0a, inset -2px -2px #fff, inset 4px 4px #808080; }
+  .btn.primary { background:var(--navy); color:#fff; box-shadow:inset -2px -2px #000, inset 2px 2px #5a74e8; }
+  .study { font:400 20px VT323, monospace; letter-spacing:1px; color:#f1e8d499; }
+  /* boot dialog */
+  .boot { position:fixed; inset:0; z-index:60; display:grid; place-items:center; background:#000; transition:opacity .5s, visibility .5s; }
+  .boot.done { opacity:0; visibility:hidden; }
+  .boot .dlg { width:min(420px, calc(100% - 40px)); background:var(--silver); color:#000; font:400 22px VT323, monospace;
+    box-shadow:inset -2px -2px #0a0a0a, inset 2px 2px #fff, inset -4px -4px #808080, inset 4px 4px #dfdfdf; padding:4px; }
+  .dlg .tb { background:linear-gradient(90deg, var(--navy), #1084d0); color:#fff; padding:3px 6px; display:flex; justify-content:space-between; }
+  .dlg .tb span:last-child { background:var(--silver); color:#000; width:20px; text-align:center; box-shadow:inset -1px -1px #0a0a0a, inset 1px 1px #fff; }
+  .dlg .in { padding:18px 18px 16px; }
+  .dlg .bar { height:24px; margin:12px 0 6px; padding:3px; background:#fff; box-shadow:inset 2px 2px #808080, inset -2px -2px #fff; display:flex; gap:3px; overflow:hidden; }
+  .dlg .bar i { flex:0 0 14px; background:var(--navy); opacity:0; animation:fill 1.6s steps(1) forwards; }
+  @keyframes fill { to { opacity:1; } }
+  .dlg small { font-size:18px; color:#444; }
+  /* the content windows, re-skinned as Win98 dialogs */
+  .window { border-radius:0 !important; border:0 !important; background:var(--silver) !important; padding:4px !important;
+    box-shadow:inset -2px -2px #0a0a0a, inset 2px 2px #fff, inset -4px -4px #808080, inset 4px 4px #dfdfdf, 0 30px 80px #000 !important; }
+  .winbar { background:linear-gradient(90deg, var(--navy), #1084d0) !important; color:#fff !important; padding:4px 4px 4px 10px !important; border:0 !important; gap:10px !important; }
+  .winbar h2, .winnum { font:400 22px/1 VT323, monospace !important; letter-spacing:.5px !important; color:#fff !important; text-transform:none !important; }
+  .winbar .close { background:var(--silver) !important; color:#000 !important; font:400 18px/1 VT323, monospace !important; padding:4px 8px !important;
+    box-shadow:inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080 !important; }
+  .winbody { background:var(--paper); margin-top:4px; box-shadow:inset 2px 2px #808080, inset -2px -2px #fff; }
+  @media (prefers-reduced-motion: reduce) { .grain, .rec::before, .hero h1::after { animation:none; } .boot { display:none; } }
+
+  /* lights */
+  #veil, #glows { transition:opacity .8s; }
+  body.dark #veil { opacity:.55; }
+  body.dark #glows { opacity:1; mix-blend-mode:screen; }
+
+  /* frame UI */
+  .top { position:fixed; inset:0 0 auto; z-index:10; display:flex; align-items:center; padding:24px clamp(20px,3vw,44px); gap:20px; }
+  .logo .mark { width:1.05em; height:1.05em; image-rendering:pixelated; vertical-align:-.16em; margin-right:.3em; }
+  .logo { font:400 34px/1 VT323, monospace; letter-spacing:1px; color:var(--paper); text-decoration:none; }
+  .top nav { margin-left:auto; display:flex; gap:8px; }
+  .btn { border:0; }
+  .hero { position:fixed; left:clamp(20px,3vw,44px); top:clamp(88px,12vh,128px); z-index:10; pointer-events:none; max-width:min(760px,52vw); }
+  .hero h1 { margin:0 0 16px; font:400 clamp(40px,4.3vw,78px)/.85 VT323, monospace; letter-spacing:-1px; text-shadow:0 2px 0 #000, 0 0 18px #000; }
+  .hero h1 mark { background:var(--navy); color:#fff; padding:0 .12em; text-shadow:none; }
+  .hero em { color:var(--amber); }
+  .hero p { display:inline-block; background:#ffffe1; color:#000 !important; border:1px solid #000; padding:5px 8px; font:13px/1.45 Tahoma, Verdana, "Segoe UI", sans-serif !important; box-shadow:2px 2px 0 #0008; margin:0; font-size:15px; line-height:1.5; color:#f1e8d4b0; max-width:26em; }
+
+  /* placeholder window */
+  .ov { position:fixed; inset:0; z-index:20; display:grid; place-items:center; background:#000c; }
+  .ov[hidden] { display:none; }
+  .card { background:var(--paper); color:var(--ink); width:min(520px,calc(100% - 32px)); padding:30px 32px 34px; position:relative; transform:rotate(-1.2deg); box-shadow:0 30px 80px #000; }
+  .card .n { font:700 11px "Space Grotesk"; letter-spacing:2px; color:var(--cut); }
+  .card h2 { margin:6px 0 10px; font:400 52px/1 "Instrument Serif",serif; }
+  .card p { margin:0; color:#6f675e; }
+  .card button { position:absolute; top:14px; right:16px; border:0; background:none; font:700 12px "Space Grotesk"; letter-spacing:1px; cursor:pointer; }
+
+  .ptag .dot { display:none; }
+  .tip { position:fixed; z-index:9; pointer-events:none; max-width:260px; background:#ffffe1; color:#000; border:1px solid #000; box-shadow:2px 2px 0 #0009;
+    font:12px/1.4 Tahoma, Verdana, "Segoe UI", sans-serif; padding:6px 9px 7px; opacity:0; transform:translateY(4px); transition:opacity .12s, transform .12s; }
+  .tip.on { opacity:1; transform:none; transition-delay:.25s; }
+  .tip b { display:block; font-weight:700; margin-bottom:2px; }
+  .tip::before { content:""; position:absolute; left:14px; top:-8px; border:8px solid transparent; border-top:0; border-bottom-color:#000; }
+  .tip::after { content:""; position:absolute; left:15px; top:-6px; border:7px solid transparent; border-top:0; border-bottom-color:#ffffe1; }
+  .ptag .dot circle { fill:var(--cut); stroke:var(--paper); stroke-width:3; vector-effect:non-scaling-stroke; filter:url(#drop); }
+  .ptag .dot text { font:700 36px "Space Grotesk"; fill:#fff; }
+  .swipe { display:none; }
+  .phone-screen { background:url("concept/backdrop-post.jpg") center / cover !important; }
+  body:not(.upright) .rotate ~ .top { }
+
+  /* short screens (phones held sideways): numbered dots instead of labels */
+  @media (max-height:560px) {
+    .ptag > g:first-of-type, .ptag .string, .ptag .pin { display:none; }
+    .ptag .dot { display:inline; }
+    .hero h1 { font-size:32px; } .hero p { display:none; } .hero { top:54px; }
+    .top { padding:10px 14px; gap:12px; } .logo { font-size:15px; } .study { display:none; }
+    .btn, .btn.ghost { padding:5px 8px 4px; font-size:17px; }
+    .hud { font-size:15px; bottom:10px !important; } .hud.bl { gap:10px; } .hud.bl span:nth-child(2) { display:none; }
+    .lock b { font-size:15px; }
+  }
+
+  /* phones held upright: start screen, then a swipeable room */
+  @media (max-width:760px) and (orientation:portrait) {
+    body:not(.upright) .top, body:not(.upright) .hero { visibility:hidden; }
+    .study, #lightsBtn { display:none; }
+    .top { padding:14px 16px; gap:10px; } .logo { font-size:16px; } .btn { padding:8px 11px; font-size:11px; }
+    .pan { position:fixed; inset:0; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+    .pan::-webkit-scrollbar { display:none; }
+    .collage { position:absolute; inset:auto; top:0; left:0; height:100svh; width:150svh; }
+    .hero { top:64px; max-width:none; right:16px; }
+    .hero h1 { font-size:40px; } .hero p { font-size:14px; }
+    .swipe { display:block; position:fixed; left:50%; bottom:max(14px, env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:9; margin:0;
+      padding:7px 14px; border-radius:999px; background:#14110ecc; color:var(--paper); font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; pointer-events:none; transition:opacity .6s; }
+    .swiped .swipe { opacity:0; }
+  }
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style id="quiet">
+  :root { --q-ink:#f1e8d4; --q-dim:#f1e8d48c; --q-line:#f1e8d433; --q-bg:#14110e; --mono:"IBM Plex Mono", ui-monospace, monospace; --sans:"IBM Plex Sans", system-ui, sans-serif; }
+  html, body, .piece.decor, .piece, .screen, button, a, .ptag { cursor:auto; }
+  .piece:not(.decor), .screen, button, a, .ptag .card, .ptag .dot { cursor:pointer; }
+  body { font-family:var(--sans); }
+  .scan, .grain, .hud.bl { display:none !important; }
+  /* top bar */
+  .logo { font:500 15px/1 var(--mono) !important; letter-spacing:.14em !important; }
+  .logo .mark { width:20px !important; height:20px !important; image-rendering:auto !important; vertical-align:-5px !important; margin-right:10px !important; }
+  .study { font:400 12px var(--mono) !important; letter-spacing:.06em !important; color:var(--q-dim) !important; }
+  .btn, .btn.ghost { font:500 12px/1 var(--mono) !important; letter-spacing:.08em !important; text-transform:uppercase; padding:10px 14px !important;
+    background:transparent !important; color:var(--q-ink) !important; box-shadow:inset 0 0 0 1px var(--q-line) !important; border-radius:0 !important; }
+  .btn:hover { box-shadow:inset 0 0 0 1px var(--q-ink) !important; }
+  .btn.primary { background:var(--q-ink) !important; color:#000 !important; box-shadow:none !important; }
+  /* hero */
+  .hero h1 { font:500 clamp(30px,3.1vw,50px)/1.05 var(--mono) !important; letter-spacing:-.04em !important; text-shadow:0 0 24px #000 !important; }
+  .hero h1 mark { padding:0 .08em; }
+  .hero p { background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important;
+    font:400 14px/1.5 var(--sans) !important; color:var(--q-dim) !important; text-shadow:0 0 12px #000; }
+  /* numbered chips: flat squares, label in plain type */
+  .ptag .bg, .ptag .mini { fill:var(--q-bg) !important; stroke:var(--q-line) !important; stroke-width:1.5 !important; filter:none !important; }
+  .ptag .hi, .ptag .lo { display:none; }
+  .ptag .chip { fill:transparent !important; }
+  .ptag.on .chip { fill:var(--cut) !important; }
+  .ptag .num { font:500 20px var(--mono) !important; fill:var(--q-ink) !important; }
+  .ptag .lbl { font:500 18px var(--mono) !important; letter-spacing:.06em !important; fill:var(--q-ink) !important; }
+  .ptag.on .bg { fill:var(--q-bg) !important; stroke:var(--q-ink) !important; }
+  .ptag .pin { fill:var(--q-ink) !important; stroke:none !important; }
+  .ptag .dot circle { fill:var(--q-bg) !important; stroke:var(--q-ink) !important; stroke-width:1.5 !important; filter:none !important; }
+  .ptag .dot text { font:500 30px var(--mono) !important; fill:var(--q-ink) !important; }
+  /* hover: thin brackets + a plain label */
+  .lock i { border-width:1px !important; width:14px !important; height:14px !important; border-color:var(--q-ink) !important; }
+  .lock.on { animation:none !important; }
+  .tip { background:var(--q-bg) !important; color:var(--q-ink) !important; border:1px solid var(--q-line) !important; box-shadow:none !important;
+    font:400 13px/1.45 var(--sans) !important; padding:10px 12px !important; max-width:240px !important; }
+  .tip b { font:500 11px/1 var(--mono) !important; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px !important; color:var(--q-ink); }
+  .tip::before, .tip::after { display:none !important; }
+  .hud.br { font:400 12px/1 var(--mono) !important; letter-spacing:.06em !important; color:var(--q-ink) !important; text-shadow:none !important; background:var(--q-bg); padding:7px 10px; }
+  .hud .open, .hud .closed { color:var(--q-ink) !important; }
+  /* loader */
+  .loader { font:400 11px/1 var(--mono) !important; letter-spacing:.14em !important; color:var(--q-dim) !important; }
+  .loader .track { height:1px !important; padding:0 !important; background:var(--q-line) !important; box-shadow:none !important; }
+  .loader i { background:var(--q-ink) !important; box-shadow:none !important; }
+  /* screens on the tower */
+  .st-k, .st-t { font-family:var(--mono) !important; }
+
+  /* ---------- windows: flat paper panels ---------- */
+  .window { background:#f3efe6 !important; padding:0 !important; box-shadow:0 40px 120px #000 !important; font-family:var(--sans) !important; color:#141210 !important; }
+  .winbar { background:transparent !important; color:#141210 !important; padding:14px 18px 14px 28px !important; border-bottom:1px solid #1412101f !important; }
+  .winbar h2, .winnum { font:500 11px/1 var(--mono) !important; letter-spacing:.12em !important; text-transform:uppercase !important; color:#141210 !important; }
+  .winnum { color:var(--cut) !important; }
+  .winbar .close { background:none !important; box-shadow:none !important; font:500 11px/1 var(--mono) !important; letter-spacing:.12em !important; color:#141210 !important; padding:8px 0 8px 10px !important; }
+  .winbody { background:transparent !important; box-shadow:none !important; margin:0 !important; padding:28px 32px 34px !important; }
+  .kicker { font:500 11px/1 var(--mono) !important; letter-spacing:.12em !important; color:#14121099 !important; }
+  .display { font:600 clamp(34px,4.6vw,48px)/1.02 var(--sans) !important; letter-spacing:-.03em !important; }
+  .display em { font-style:normal; background:var(--cut); color:#fff; padding:0 .08em; }
+  .lead { font:400 17px/1.5 var(--sans) !important; color:#141210 !important; }
+  .winbody p { font-family:var(--sans); font-size:14px; }
+  .pic { padding:0 !important; box-shadow:none !important; background:none !important; }
+  .grp { border-top:1px solid #1412101f !important; }
+  .grp > h4, .winbody .grp > h4 { font:500 11px/1 var(--mono) !important; letter-spacing:.12em !important; }
+  .facts b, .price, .way b, .day b, .menu .lbl, .ticks, .summary b { font-family:var(--sans) !important; font-weight:600 !important; letter-spacing:-.02em; }
+  .facts b { font-size:32px !important; } .price { font-size:44px !important; } .way b { font-size:22px !important; } .menu .lbl { font-size:24px !important; }
+  .ticks { font:400 15px/1.9 var(--sans) !important; }
+  .day, .hslot, .window .btn, .window .btn.wide, .way { background:#fff !important; color:#141210 !important; box-shadow:inset 0 0 0 1px #14121026 !important; border-radius:0 !important; }
+  .day b { font-size:26px !important; }
+  .day small, .hslot small { font-family:var(--mono) !important; }
+  .day[aria-checked="true"], .hslot.sel { background:var(--cut) !important; color:#fff !important; box-shadow:none !important; }
+  .hslot.taken, .hslot.past { background:transparent !important; color:#14121055 !important; box-shadow:inset 0 0 0 1px #1412100f !important; }
+  .booking input, .booking select { background:#fff !important; box-shadow:inset 0 0 0 1px #14121033 !important; font-family:var(--sans) !important; font-size:14px !important; }
+  .window .btn, .window .btn.wide { font:500 12px/1 var(--mono) !important; letter-spacing:.1em !important; text-transform:uppercase; padding:14px 18px !important; }
+  .window .btn:hover { box-shadow:inset 0 0 0 1px #141210 !important; }
+  .window .btn.wide, .window > .winbody > .btn { background:#141210 !important; color:#f3efe6 !important; box-shadow:none !important; }
+  .summary { background:#141210 !important; color:#f3efe6 !important; font:400 14px/1.5 var(--sans) !important; }
+  .summary b { font-size:22px !important; }
+  .way:nth-child(2) { background:var(--cut) !important; color:#fff !important; box-shadow:none !important; }
+  .pkg.premium { background:var(--cut) !important; }
+  .menu button:hover .lbl { background:none !important; color:var(--cut) !important; }
+  .rotate-title, .rotate-logo { font-family:var(--mono) !important; }
+  @media (max-height:560px) { .hero h1 { font-size:22px !important; } .hero { top:48px !important; } .logo { font-size:12px !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="#"><img class="mark" src="mark-quiet.svg" alt="" width="26" height="26">COUCH CO-OP</a>
+  <span class="study">Pilot · POST Houston</span>
+  <nav><button class="btn ghost" data-open="menu" aria-haspopup="dialog">Index</button><button class="btn primary" data-open="book">Book the room</button></nav>
+</header>
+<div class="loader" aria-hidden="true"><p>LOADING <span id="loadtxt"></span></p><div class="track"><i id="loadbar"></i></div></div>
+<div class="pan" id="pan"><svg class="collage" id="scene" viewBox="0 0 2000 1333" preserveAspectRatio="xMidYMax slice" role="group" aria-label="Couch Co-Op: a living room for play, collaged into the POST Houston atrium">
+  <defs>
+    <mask id="a0" maskUnits="userSpaceOnUse" x="0" y="0" width="600" height="900"><image href="concept/lite/pipes-a.jpg" width="600" height="900" preserveAspectRatio="none"/></mask><mask id="a1" maskUnits="userSpaceOnUse" x="0" y="0" width="569" height="900"><image href="concept/lite/rack-forest-a.jpg" width="569" height="900" preserveAspectRatio="none"/></mask><mask id="a2" maskUnits="userSpaceOnUse" x="0" y="0" width="621" height="788"><image href="concept/lite/lanterns-a.jpg" width="621" height="788" preserveAspectRatio="none"/></mask><mask id="a3" maskUnits="userSpaceOnUse" x="0" y="0" width="856" height="900"><image href="concept/lite/kilim-a.jpg" width="856" height="900" preserveAspectRatio="none"/></mask><mask id="a4" maskUnits="userSpaceOnUse" x="0" y="0" width="900" height="754"><image href="concept/lite/rugs-a.jpg" width="900" height="754" preserveAspectRatio="none"/></mask><clipPath id="c5"><path d="M282.0 0.0 L609.0 0.0 L609.0 806.0 L262.0 806.0 L262.0 228.0 L264.0 99.0 L282.0 90.0Z"/></clipPath><mask id="a6" maskUnits="userSpaceOnUse" x="0" y="0" width="900" height="635"><image href="concept/lite/crt-blocks-a.jpg" width="900" height="635" preserveAspectRatio="none"/></mask><mask id="a7" maskUnits="userSpaceOnUse" x="0" y="0" width="398" height="900"><image href="concept/lite/lamp-mushroom-a.jpg" width="398" height="900" preserveAspectRatio="none"/></mask><mask id="a8" maskUnits="userSpaceOnUse" x="0" y="0" width="900" height="407"><image href="concept/lite/floor-sofa-a.jpg" width="900" height="407" preserveAspectRatio="none"/></mask><mask id="a9" maskUnits="userSpaceOnUse" x="0" y="0" width="900" height="522"><image href="concept/lite/togo-a.jpg" width="900" height="522" preserveAspectRatio="none"/></mask><mask id="a10" maskUnits="userSpaceOnUse" x="0" y="0" width="688" height="900"><image href="concept/lite/crt-cam-a.jpg" width="688" height="900" preserveAspectRatio="none"/></mask><mask id="a11" maskUnits="userSpaceOnUse" x="0" y="0" width="900" height="538"><image href="concept/lite/pouf-a.jpg" width="900" height="538" preserveAspectRatio="none"/></mask><mask id="a12" maskUnits="userSpaceOnUse" x="0" y="0" width="657" height="900"><image href="concept/lite/clamp-lamp-a.jpg" width="657" height="900" preserveAspectRatio="none"/></mask>
+    <filter id="drop" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity=".6"/></filter>
+    <filter id="sticker" x="-10%" y="-10%" width="120%" height="125%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="10" result="grow"/>
+      <feFlood flood-color="#f1e8d4"/><feComposite in2="grow" operator="in" result="edge"/>
+      <feMerge><feMergeNode in="edge"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="tvscan" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="1.6" fill="#000" opacity=".35"/></pattern>
+    <radialGradient id="sheen" cx=".3" cy=".2" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#ffd27a" stop-opacity=".7"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="candleglow"><stop offset="0" stop-color="#ffcf6e" stop-opacity=".75"/><stop offset=".4" stop-color="#ffb347" stop-opacity=".22"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient>
+    <radialGradient id="fade" cx=".5" cy=".55" r=".75"><stop offset=".55" stop-color="#14110e" stop-opacity="0"/><stop offset="1" stop-color="#14110e" stop-opacity=".85"/></radialGradient>
+    <linearGradient id="left" x1="0" x2="1"><stop offset=".12" stop-color="#14110e" stop-opacity=".92"/><stop offset=".42" stop-color="#14110e" stop-opacity="0"/></linearGradient>
+    <radialGradient id="pool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffcf8a" stop-opacity=".16"/><stop offset="1" stop-color="#ffcf8a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <image href="concept/backdrop-lite.jpg" width="2000" height="1333" opacity=".22"/>
+  <path d="M-507 880 L-2640 1333 M-399 880 L-2380 1333 M-292 880 L-2120 1333 M-184 880 L-1860 1333 M-76 880 L-1600 1333 M31 880 L-1340 1333 M139 880 L-1080 1333 M247 880 L-820 1333 M354 880 L-560 1333 M462 880 L-300 1333 M569 880 L-40 1333 M677 880 L220 1333 M785 880 L480 1333 M892 880 L740 1333 M1000 880 L1000 1333 M1108 880 L1260 1333 M1215 880 L1520 1333 M1323 880 L1780 1333 M1431 880 L2040 1333 M1538 880 L2300 1333 M1646 880 L2560 1333 M1753 880 L2820 1333 M1861 880 L3080 1333 M1969 880 L3340 1333 M2076 880 L3600 1333 M2184 880 L3860 1333 M2292 880 L4120 1333 M2399 880 L4380 1333 M2507 880 L4640 1333 M0 893 H2000 M0 910 H2000 M0 932 H2000 M0 962 H2000 M0 1002 H2000 M0 1055 H2000 M0 1125 H2000 M0 1215 H2000 M0 1330 H2000" fill="none" stroke="#f1e8d4" stroke-opacity=".09" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+  <rect y="878" width="2000" height="2" fill="#f1e8d4" opacity=".14"/>
+  <rect width="2000" height="1333" fill="url(#fade)"/>
+  <rect width="2000" height="760" fill="url(#left)"/>
+  <ellipse cx="1000" cy="1120" rx="900" ry="260" fill="url(#pool)"/>
+  <rect id="veil" width="2000" height="1333" fill="#000" opacity="0"/>
+  <g id="glows" opacity="0"><circle cx="1800" cy="1080" r="260" fill="url(#glow)"/></g>
+  
+  <g class="piece decor" aria-hidden="true"><g transform="translate(1900 520) rotate(0) scale(0.75 0.75) translate(-300.0 -450.0)"><g class="lift"><g><image class="thin" href="concept/lite/pipes.jpg" width="600" height="900" preserveAspectRatio="none" mask="url(#a0)"/></g></g></g></g><g class="piece decor" aria-hidden="true"><g transform="translate(1690 640) rotate(0) scale(0.62 0.62) translate(-284.5 -450.0)"><g class="lift"><g><image class="thin" href="concept/lite/rack-forest.jpg" width="569" height="900" preserveAspectRatio="none" mask="url(#a1)"/></g><defs><clipPath id="tv1_0"><polygon points="108,140 498,140 498,548 108,548"/></clipPath></defs><g class="tv" clip-path="url(#tv1_0)"><image class="base" style="animation-duration:10.4s;animation-delay:-1.7s" href="concept/tv/tv1.jpg" x="108" y="140" width="390" height="408" preserveAspectRatio="xMidYMid slice"/><image class="slide" style="animation-duration:10.4s;animation-delay:-9.5s" href="concept/tv/tv3.jpg" x="108" y="140" width="390" height="408" preserveAspectRatio="xMidYMid slice"/><image class="slide" style="animation-duration:10.4s;animation-delay:-6.9s" href="concept/tv/tv2.jpg" x="108" y="140" width="390" height="408" preserveAspectRatio="xMidYMid slice"/><image class="slide" style="animation-duration:10.4s;animation-delay:-4.3s" href="concept/tv/tv6.jpg" x="108" y="140" width="390" height="408" preserveAspectRatio="xMidYMid slice"/><rect x="108" y="140" width="390" height="408" fill="url(#tvscan)"/><rect class="sheen" x="108" y="140" width="390" height="408" fill="url(#sheen)"/></g></g></g></g><g class="piece decor" aria-hidden="true"><g transform="translate(150 640) rotate(0) scale(0.55 0.55) translate(-310.5 -394.0)"><g class="lift"><g><image class="cut" href="concept/lite/lanterns.jpg" width="621" height="788" preserveAspectRatio="none" mask="url(#a2)"/></g></g></g></g><g class="piece" data-id="setup" data-open="setup" tabindex="0" role="button" aria-label="05 The setup"><g transform="translate(1010 1170) rotate(-3) scale(1.05 0.441) translate(-428.0 -450.0)"><g class="lift low"><g><image class="flat" href="concept/lite/kilim.jpg" width="856" height="900" preserveAspectRatio="none" mask="url(#a3)"/></g></g></g></g><g class="piece" data-id="vision" data-open="vision" tabindex="0" role="button" aria-label="04 Our vision"><g transform="translate(1640 1215) rotate(4) scale(0.62 0.31) translate(-450.0 -377.0)"><g class="lift low"><g><image class="flat" href="concept/lite/rugs.jpg" width="900" height="754" preserveAspectRatio="none" mask="url(#a4)"/></g></g></g></g><g class="piece decor"><g transform="translate(1000 640) rotate(0) scale(1.08 1.08) translate(-435.5 -403.0)"><g class="lift"><path class="paper" d="M282.0 0.0 L609.0 0.0 L609.0 806.0 L262.0 806.0 L262.0 228.0 L264.0 99.0 L282.0 90.0Z"/><image href="concept/render/tower.jpg" width="822" height="806" clip-path="url(#c5)" preserveAspectRatio="none"/></g><defs><clipPath id="scr0"><polygon points="279,316 426,277 429,468 280,474"/></clipPath></defs><g class="piece screen" data-id="publishers" data-open="publishers" tabindex="0" role="button" aria-label="07 For publishers"><g clip-path="url(#scr0)"><image class="slide" style="animation-duration:9s;animation-delay:0s" href="concept/render/slide1.jpg" x="279" y="277" width="150" height="197" preserveAspectRatio="xMidYMid slice"/><image class="slide" style="animation-duration:9s;animation-delay:3s" href="concept/render/slide2.jpg" x="279" y="277" width="150" height="197" preserveAspectRatio="xMidYMid slice"/><image class="slide" style="animation-duration:9s;animation-delay:6s" href="concept/render/slide3.jpg" x="279" y="277" width="150" height="197" preserveAspectRatio="xMidYMid slice"/></g><g class="flip"><polygon class="blue" points="279,316 426,277 429,468 280,474"/><g transform="translate(354 376) rotate(-14)"><text class="st-k" y="-20.4" text-anchor="middle" style="font-size:5.1px">FEATURED SCREEN</text><text class="st-t" y="-2.8" text-anchor="middle" style="font-size:16px">YOUR GAME</text><text class="st-t" y="14.0" text-anchor="middle" style="font-size:16px">HERE</text></g></g><polygon class="bezel" points="279,316 426,277 429,468 280,474"/></g><defs><clipPath id="scr1"><polygon points="271,98 435,38 457,196 293,229"/></clipPath></defs><g class="piece screen" data-id="sidescreen" data-open="sidescreen" tabindex="0" role="button" aria-label="08 Side screen"><g clip-path="url(#scr1)"><image class="slide" style="animation-duration:6s;animation-delay:0s" href="concept/render/slide4.jpg" x="271" y="38" width="186" height="191" preserveAspectRatio="xMidYMid slice"/><image class="slide" style="animation-duration:6s;animation-delay:3s" href="concept/render/slide5.jpg" x="271" y="38" width="186" height="191" preserveAspectRatio="xMidYMid slice"/></g><g class="flip"><polygon class="blue" points="271,98 435,38 457,196 293,229"/><g transform="translate(364 134) rotate(-20)"><text class="st-k" y="-16.5" text-anchor="middle" style="font-size:7.0px">ALSO</text><text class="st-t" y="7.7" text-anchor="middle" style="font-size:22px">PLAYING</text></g></g><polygon class="bezel" points="271,98 435,38 457,196 293,229"/></g></g></g><g class="piece" data-id="program" data-open="program" tabindex="0" role="button" aria-label="03 Program"><g transform="translate(1450 900) rotate(0) scale(0.48 0.48) translate(-450.0 -317.5)"><g class="lift"><g><image class="cut" href="concept/lite/crt-blocks.jpg" width="900" height="635" preserveAspectRatio="none" mask="url(#a6)"/></g><defs><clipPath id="tv6_0"><polygon points="22,148 168,148 165,256 25,256"/></clipPath></defs><g class="tv" clip-path="url(#tv6_0)"><image class="base" style="animation-duration:5.2s;animation-delay:-5.0s" href="concept/tv/tv4.jpg" x="22" y="148" width="146" height="108" preserveAspectRatio="xMidYMid slice"/><image class="slide" style="animation-duration:5.2s;animation-delay:-2.4s" href="concept/tv/tv1.jpg" x="22" y="148" width="146" height="108" preserveAspectRatio="xMidYMid slice"/><rect x="22" y="148" width="146" height="108" fill="url(#tvscan)"/><rect class="sheen" x="22" y="148" width="146" height="108" fill="url(#sheen)"/></g><defs><clipPath id="tv6_1"><polygon points="355,48 545,48 545,186 355,186"/></clipPath></defs><g class="tv" clip-path="url(#tv6_1)"><image class="base" style="animation-duration:7.8s;animation-delay:-3.5s" href="concept/tv/tv2.jpg" x="355" y="48" width="190" height="138" preserveAspectRatio="xMidYMid slice"/><image class="slide" style="animation-duration:7.8s;animation-delay:-0.9s" href="concept/tv/tv6.jpg" x="355" y="48" width="190" height="138" preserveAspectRatio="xMidYMid slice"/><image class="slide" style="animation-duration:7.8s;animation-delay:-6.1s" href="concept/tv/tv3.jpg" x="355" y="48" width="190" height="138" preserveAspectRatio="xMidYMid slice"/><rect x="355" y="48" width="190" height="138" fill="url(#tvscan)"/><rect class="sheen" x="355" y="48" width="190" height="138" fill="url(#sheen)"/></g><defs><clipPath id="tv6_2"><polygon points="667,160 815,160 813,262 668,262"/></clipPath></defs><g class="tv" clip-path="url(#tv6_2)"><image class="base" style="animation-duration:5.2s;animation-delay:-2.0s" href="concept/tv/tv5.jpg" x="667" y="160" width="148" height="102" preserveAspectRatio="xMidYMid slice"/><image class="slide" style="animation-duration:5.2s;animation-delay:-4.6s" href="concept/tv/tv3.jpg" x="667" y="160" width="148" height="102" preserveAspectRatio="xMidYMid slice"/><rect x="667" y="160" width="148" height="102" fill="url(#tvscan)"/><rect class="sheen" x="667" y="160" width="148" height="102" fill="url(#sheen)"/></g></g></g></g><g class="piece decor" aria-hidden="true"><g transform="translate(330 960) rotate(0) scale(0.36 0.36) translate(-199.0 -450.0)"><g class="lift"><g><image class="cut" href="concept/lite/lamp-mushroom.jpg" width="398" height="900" preserveAspectRatio="none" mask="url(#a7)"/></g></g></g></g><g class="piece" data-id="dropin" data-open="dropin" tabindex="0" role="button" aria-label="01 Drop in"><g transform="translate(640 1050) rotate(-2) scale(0.7 0.7) translate(-450.0 -203.5)"><g class="lift"><g><image class="cut" href="concept/lite/floor-sofa.jpg" width="900" height="407" preserveAspectRatio="none" mask="url(#a8)"/></g></g></g></g><g class="piece" data-id="book" data-open="book" tabindex="0" role="button" aria-label="02 Book the room"><g transform="translate(1300 1060) rotate(3) scale(0.52 0.52) translate(-450.0 -261.0)"><g class="lift"><g><image class="cut" href="concept/lite/togo.jpg" width="900" height="522" preserveAspectRatio="none" mask="url(#a9)"/></g></g></g></g><g class="piece" data-id="visit" data-open="visit" tabindex="0" role="button" aria-label="06 Visit us"><g transform="translate(200 1080) rotate(-3) scale(0.36 0.36) translate(-344.0 -450.0)"><g class="lift"><g><image class="cut" href="concept/lite/crt-cam.jpg" width="688" height="900" preserveAspectRatio="none" mask="url(#a10)"/></g><defs><clipPath id="tv10_0"><polygon points="196,240 622,230 622,632 200,648"/></clipPath></defs><g class="tv" clip-path="url(#tv10_0)"><image class="base" style="animation-duration:5.2s;animation-delay:-1.4s" href="concept/tv/tv5.jpg" x="196" y="230" width="426" height="418" preserveAspectRatio="xMidYMid slice"/><image class="slide" style="animation-duration:5.2s;animation-delay:-4.0s" href="concept/tv/tv2.jpg" x="196" y="230" width="426" height="418" preserveAspectRatio="xMidYMid slice"/><rect x="196" y="230" width="426" height="418" fill="url(#tvscan)"/><rect class="sheen" x="196" y="230" width="426" height="418" fill="url(#sheen)"/></g></g></g></g><g class="piece" data-id="program" data-open="program" tabindex="0" role="button" aria-label="03 Program"><g transform="translate(990 1195) rotate(-1) scale(0.34 0.34) translate(-450.0 -269.0)"><g class="lift"><g><image class="cut" href="concept/lite/pouf.jpg" width="900" height="538" preserveAspectRatio="none" mask="url(#a11)"/></g></g></g></g><g class="piece decor" aria-hidden="true"><g transform="translate(1520 300) rotate(0) scale(0.3 0.3) translate(-328.5 -450.0)"><g class="lift"><g><image class="cut" href="concept/lite/clamp-lamp.jpg" width="657" height="900" preserveAspectRatio="none" mask="url(#a12)"/></g></g></g></g>
+  <g class="ptags" aria-hidden="true"><g class="ptag" data-for="dropin"><path class="string" d="M382 852 L 560 852 L 560 930"/><rect class="pin" x="555" y="925" width="10" height="10"/><g class="card" data-for="dropin"><g class="full"><rect class="bg" x="360" y="830" width="236" height="44"/><path class="hi" d="M361.5 872.5 V831.5 H594"/><path class="lo" d="M361.5 872.5 H594 V831.5"/><text class="lbl" x="416" y="861">DROP IN · PLAY</text></g><rect class="mini" x="360" y="830" width="52" height="44"/><rect class="chip" x="366" y="836" width="40" height="32"/><text class="num" x="386" y="860" text-anchor="middle">01</text></g><g class="dot" data-for="dropin"><circle cx="560" cy="896" r="34"/><text x="560" y="909" text-anchor="middle">01</text></g></g><g class="ptag" data-for="book"><path class="string" d="M1102 892 L 1250 892 L 1250 955"/><rect class="pin" x="1245" y="950" width="10" height="10"/><g class="card" data-for="book"><g class="full"><rect class="bg" x="1080" y="870" width="223" height="44"/><path class="hi" d="M1081.5 912.5 V871.5 H1302"/><path class="lo" d="M1081.5 912.5 H1302 V871.5"/><text class="lbl" x="1136" y="901">BOOK THE ROOM</text></g><rect class="mini" x="1080" y="870" width="52" height="44"/><rect class="chip" x="1086" y="876" width="40" height="32"/><text class="num" x="1106" y="900" text-anchor="middle">02</text></g><g class="dot" data-for="book"><circle cx="1250" cy="921" r="34"/><text x="1250" y="934" text-anchor="middle">02</text></g></g><g class="ptag" data-for="program"><path class="string" d="M1482 712 L 1450 712 L 1450 770"/><rect class="pin" x="1445" y="765" width="10" height="10"/><g class="card" data-for="program"><g class="full"><rect class="bg" x="1460" y="690" width="248" height="44"/><path class="hi" d="M1461.5 732.5 V691.5 H1706"/><path class="lo" d="M1461.5 732.5 H1706 V691.5"/><text class="lbl" x="1516" y="721">SNACKS & NIGHTS</text></g><rect class="mini" x="1460" y="690" width="52" height="44"/><rect class="chip" x="1466" y="696" width="40" height="32"/><text class="num" x="1486" y="720" text-anchor="middle">03</text></g><g class="dot" data-for="program"><circle cx="1450" cy="736" r="34"/><text x="1450" y="749" text-anchor="middle">03</text></g></g><g class="ptag" data-for="vision"><path class="string" d="M1722 1132 L 1680 1132 L 1680 1200"/><rect class="pin" x="1675" y="1195" width="10" height="10"/><g class="card" data-for="vision"><g class="full"><rect class="bg" x="1700" y="1110" width="174" height="44"/><path class="hi" d="M1701.5 1152.5 V1111.5 H1872"/><path class="lo" d="M1701.5 1152.5 H1872 V1111.5"/><text class="lbl" x="1756" y="1141">SHOES OFF</text></g><rect class="mini" x="1700" y="1110" width="52" height="44"/><rect class="chip" x="1706" y="1116" width="40" height="32"/><text class="num" x="1726" y="1140" text-anchor="middle">04</text></g><g class="dot" data-for="vision"><circle cx="1680" cy="1166" r="34"/><text x="1680" y="1179" text-anchor="middle">04</text></g></g><g class="ptag" data-for="setup"><path class="string" d="M1172 1254 L 1215 1254 L 1215 1200"/><rect class="pin" x="1210" y="1195" width="10" height="10"/><g class="card" data-for="setup"><g class="full"><rect class="bg" x="1150" y="1232" width="174" height="44"/><path class="hi" d="M1151.5 1274.5 V1233.5 H1322"/><path class="lo" d="M1151.5 1274.5 H1322 V1233.5"/><text class="lbl" x="1206" y="1263">THE SETUP</text></g><rect class="mini" x="1150" y="1232" width="52" height="44"/><rect class="chip" x="1156" y="1238" width="40" height="32"/><text class="num" x="1176" y="1262" text-anchor="middle">05</text></g><g class="dot" data-for="setup"><circle cx="1215" cy="1166" r="34"/><text x="1215" y="1179" text-anchor="middle">05</text></g></g><g class="ptag" data-for="visit"><path class="string" d="M322 1254 L 240 1254 L 240 1215"/><rect class="pin" x="235" y="1210" width="10" height="10"/><g class="card" data-for="visit"><g class="full"><rect class="bg" x="300" y="1232" width="260" height="44"/><path class="hi" d="M301.5 1274.5 V1233.5 H559"/><path class="lo" d="M301.5 1274.5 H559 V1233.5"/><text class="lbl" x="356" y="1263">LIVE CAM · VISIT</text></g><rect class="mini" x="300" y="1232" width="52" height="44"/><rect class="chip" x="306" y="1238" width="40" height="32"/><text class="num" x="326" y="1262" text-anchor="middle">06</text></g><g class="dot" data-for="visit"><circle cx="240" cy="1181" r="34"/><text x="240" y="1194" text-anchor="middle">06</text></g></g><g class="ptag" data-for="publishers"><path class="string" d="M1272 622 L 1015 622 L 1015 620"/><rect class="pin" x="1010" y="615" width="10" height="10"/><g class="card" data-for="publishers"><g class="full"><rect class="bg" x="1250" y="600" width="236" height="44"/><path class="hi" d="M1251.5 642.5 V601.5 H1484"/><path class="lo" d="M1251.5 642.5 H1484 V601.5"/><text class="lbl" x="1306" y="631">FOR PUBLISHERS</text></g><rect class="mini" x="1250" y="600" width="52" height="44"/><rect class="chip" x="1256" y="606" width="40" height="32"/><text class="num" x="1276" y="630" text-anchor="middle">07</text></g><g class="dot" data-for="publishers"><circle cx="930" cy="690" r="34"/><text x="930" y="703" text-anchor="middle">07</text></g></g><g class="ptag" data-for="sidescreen"><path class="string" d="M1272 402 L 1040 402 L 1040 360"/><rect class="pin" x="1035" y="355" width="10" height="10"/><g class="card" data-for="sidescreen"><g class="full"><rect class="bg" x="1250" y="380" width="198" height="44"/><path class="hi" d="M1251.5 422.5 V381.5 H1447"/><path class="lo" d="M1251.5 422.5 H1447 V381.5"/><text class="lbl" x="1306" y="411">SIDE SCREEN</text></g><rect class="mini" x="1250" y="380" width="52" height="44"/><rect class="chip" x="1256" y="386" width="40" height="32"/><text class="num" x="1276" y="410" text-anchor="middle">08</text></g><g class="dot" data-for="sidescreen"><circle cx="760" cy="590" r="34"/><text x="760" y="603" text-anchor="middle">08</text></g></g></g>
+</svg></div>
+<div class="scan" aria-hidden="true"></div>
+<div class="hud bl" aria-hidden="true"><span class="rec">REC</span><span id="clock"></span></div>
+<div class="hud br" id="openNow" aria-live="polite"></div>
+<div class="lock" id="lock" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
+<div class="tip" id="tip" aria-hidden="true"></div>
+<p class="swipe" aria-hidden="true">← swipe the room →</p>
+<div class="rotate" id="rotate">
+  <div class="rotate-inner">
+    <p class="rotate-logo">COUCH CO-OP</p>
+    <div class="phone" aria-hidden="true"><div class="phone-screen"></div></div>
+    <p class="rotate-title">Turn your phone <em>sideways</em></p>
+    <p class="rotate-sub">to step into the living room</p>
+    <p class="press">▶ PRESS START</p>
+    <button class="rotate-skip" id="rotateSkip">Stay upright instead</button>
+  </div>
+</div>
+<div class="hero"><h1>A public living room<br><mark>for play.</mark></h1><p>Co-op games &amp; interactive art · POST Houston</p></div>
+<!-- ===== OVERLAY WINDOW ===== -->
+<div class="overlay" id="overlay" hidden>
+  <div class="backdrop" data-close></div>
+  <section class="window" role="dialog" aria-modal="true" aria-labelledby="winTitle" tabindex="-1">
+    <header class="winbar">
+      <span class="winnum" id="winNum"></span>
+      <h2 id="winTitle">—</h2>
+      <button class="close" data-close aria-label="Close">Close ✕</button>
+    </header>
+    <div class="winbody" id="winBody"></div>
+  </section>
+</div>
+
+<!-- ===== PANEL CONTENT (edit copy here) ===== -->
+<template id="panel-vision" data-title="Our vision">
+  <p class="kicker">Our vision</p>
+  <h3 class="display">Shoes off. <em>Settle in.</em></h3>
+  <p class="lead">A third space where people meet through cooperative games, interactive art and culture.</p>
+  <figure class="pic"><img src="images/win-vision.jpg" alt="Friends on a long floor sofa playing a co-op game on two screens"></figure>
+  <section class="grp">
+    <h4>House rules</h4>
+    <ul class="ticks"><li>Couches everywhere</li><li>Shoes off at the door</li><li>Room to sprawl on the floor</li></ul>
+  </section>
+  <section class="grp">
+    <h4>Not every game is about winning</h4>
+    <p>We pick cooperative experiences that get people talking, teaming up and discovering together. Play, watch, or just hang out.</p>
+  </section>
+  <section class="grp">
+    <h4>Two phases</h4>
+    <div class="phases">
+      <div><span class="chip">Now · Phase 1</span><p>A pop-up living room inside POST Houston: one scaffold structure, two consoles, 4–6 players.</p></div>
+      <div><span class="chip blue">Next · Phase 2</span><p>A permanent home for games and interactive art, with exhibitions, workshops and a full program.</p></div>
+    </div>
+  </section>
+  <p class="small">An initiative by Nōvo Collective.</p>
+</template>
+
+<template id="panel-featured" data-title="Featured screen">
+  <p class="kicker">The big screen</p>
+  <h3 class="display">Now <em>featuring</em></h3>
+  <p class="lead">The main screen hosts the featured co-op game. The first title will be announced soon.</p>
+  <p class="small">Want your game on this screen? <button class="link" data-open="publishers">See publisher packages →</button></p>
+</template>
+
+<template id="panel-sidescreen" data-title="Side screen">
+  <p class="kicker">The second screen</p>
+  <h3 class="display">Also <em>playing</em></h3>
+  <p class="lead">A smaller setup for indie co-op, experimental games and interactive art to try between rounds.</p>
+  <figure class="pic"><img src="images/win-sidescreen.jpg" alt="People playing with an interactive light installation projected on the floor and screens"></figure>
+  <section class="grp">
+    <h4>Lineup</h4>
+    <div class="lineup">
+      <div class="slot"><span>01</span>Indie co-op pick · TBA</div>
+      <div class="slot"><span>02</span>Interactive art piece · TBA</div>
+      <div class="slot"><span>03</span>Experimental game · TBA</div>
+    </div>
+  </section>
+  <p class="small">The lineup rotates through the pilot.</p>
+</template>
+
+<template id="panel-setup" data-title="The setup">
+  <p class="kicker">How the room works</p>
+  <h3 class="display">Two consoles, <em>4–6 players</em></h3>
+  <p class="lead">A temporary living room built from scaffolding, steel and curtains inside POST Houston. Open enough to see in, enclosed enough to feel like yours.</p>
+  <figure class="pic"><img src="images/win-setup.jpg" alt="A scaffold tower with hanging screens and CRT monitors on cinderblocks, next to floor sofas"></figure>
+  <div class="facts">
+    <div><b>2</b><span>consoles</span></div>
+    <div><b>2</b><span>screens: featured + side</span></div>
+    <div><b>4–6</b><span>people at a time</span></div>
+  </div>
+  <section class="grp">
+    <h4>Two ways in</h4>
+    <div class="two-ways">
+      <button class="way" data-open="dropin"><b>Drop in</b><span>Free open play, 10am – 10pm</span></button>
+      <button class="way" data-open="book"><b>Book it</b><span>The room to yourselves, $15 / 2 hours</span></button>
+    </div>
+  </section>
+</template>
+
+<template id="panel-dropin" data-title="Drop in">
+  <p class="kicker">Open play</p>
+  <h3 class="display">Free to play. <em>Just show up.</em></h3>
+  <p class="lead">Open <b>every day, 10am – 10pm</b>. Walk in, take your shoes off, join a game. No ticket, no sign-up.</p>
+  <figure class="pic"><img src="images/win-dropin.jpg" alt="People on poufs and bean bags with controllers in front of a big screen"></figure>
+  <section class="grp">
+    <h4>This week</h4>
+    <p class="small">When a group books the room it's private for that block. Check before you come.</p>
+    <div class="hours" id="openHoursList"></div>
+  </section>
+  <button class="btn" data-open="book">Book the room · $15 / 2 hours</button>
+</template>
+
+<template id="panel-program" data-title="Program">
+  <p class="kicker">What's on</p>
+  <h3 class="display">Snacks <em>&amp; nights</em></h3>
+  <p class="lead">Co-op nights, launches and screenings during the pilot, growing into a full cultural program.</p>
+  <figure class="pic"><img src="images/win-program.jpg" alt="A screening night: people on red floor cushions facing a large projection"></figure>
+  <section class="grp">
+    <h4>During the pilot</h4>
+    <div class="program">
+      <div><h4>Publisher showcase</h4><p>Featured co-op titles on the main screen.</p></div>
+      <div><h4>Co-op nights</h4><p>Hosted play nights and friendly challenges.</p></div>
+      <div><h4>Launches &amp; previews</h4><p>First looks and early access.</p></div>
+    </div>
+  </section>
+  <section class="grp">
+    <h4>Phase 2</h4>
+    <div class="program">
+      <div><h4>Exhibitions</h4><p>Rotating, long-term interactive work.</p></div>
+      <div><h4>Workshops &amp; labs</h4><p>Artist-led sessions and developer talks.</p></div>
+      <div><h4>Talks &amp; screenings</h4><p>Performances and gatherings.</p></div>
+    </div>
+  </section>
+  <p class="small">Dates will be posted here as the pilot is scheduled.</p>
+</template>
+
+<template id="panel-publishers" data-title="For publishers">
+  <p class="kicker">Publisher showcase</p>
+  <h3 class="display">Put your game <em>in the room</em></h3>
+  <p class="lead">Your game, played by real groups on real couches, inside one of Houston's busiest cultural venues.</p>
+  <figure class="pic"><img src="images/win-publishers.jpg" alt="A featured game on a large screen above a lounge of floor sofas and CRT monitors"></figure>
+  <section class="grp">
+    <h4>Packages</h4>
+    <div class="packages">
+      <article class="pkg">
+        <p class="chip">Standard</p>
+        <p class="price">$3,000</p>
+        <p class="term"><b>10 days</b> of placement, spread over two months</p>
+      </article>
+      <article class="pkg premium">
+        <p class="chip blue">Premium</p>
+        <p class="price">$7,000</p>
+        <p class="term"><b>30 days</b> of placement</p>
+      </article>
+    </div>
+  </section>
+  <section class="grp">
+    <h4>What you get</h4>
+    <p>Audience discovery beyond the usual gaming channels, an experiential campaign, and visibility on the main screen. Tell us about your game and we'll plan the placement with you.</p>
+  </section>
+  <a class="btn" id="pubMail" href="#">Request a placement</a>
+</template>
+
+<template id="panel-visit" data-title="Visit us">
+  <p class="kicker">The first edition</p>
+  <h3 class="display">Find us at <em>POST Houston</em></h3>
+  <p class="lead">The pilot lives inside POST Houston, the former Barbara Jordan Post Office, next to the Theater District and Buffalo Bayou.</p>
+  <figure class="pic"><img src="images/post-map.jpg" alt="Map showing POST Houston between the Sawyer Heights neighborhood, the Theater District and Buffalo Bayou"></figure>
+  <section class="grp">
+    <h4>Address</h4>
+    <p><b>POST Houston</b><br>401 Franklin St, Houston, TX</p>
+  </section>
+  <p class="small">Exact spot and pilot dates coming soon. Questions? <a class="mail" href="mailto:hi@novocollective.org">hi@novocollective.org</a></p>
+</template>
+
+<template id="panel-book" data-title="Book the room">
+  <p class="kicker">Like a tennis court, but with couches</p>
+  <h3 class="display">Book <em>the room</em></h3>
+  <p class="lead">Have the living room to yourselves: both consoles, both screens, up to <b><span data-cfg="maxGuests"></span> people</b>. <b>$15 for 2 hours</b>, for the whole room.</p>
+  <form class="booking" id="bookingForm" novalidate>
+    <fieldset>
+      <legend>1 · Day</legend>
+      <div class="days" id="days" role="radiogroup" aria-label="Pick a day"></div>
+    </fieldset>
+    <fieldset>
+      <legend>2 · Time <span class="legend-note">2-hour blocks · tap the next block to stay for 4 hours</span></legend>
+      <div class="slots" id="slots"></div>
+      <div class="key"><span class="k sel"></span>Your booking <span class="k taken"></span>Booked or passed</div>
+    </fieldset>
+    <fieldset class="row">
+      <legend>3 · You</legend>
+      <label>Name<input name="name" autocomplete="name" required></label>
+      <label>Email<input name="email" type="email" autocomplete="email" required></label>
+      <label>Group size<select name="guests" id="guests"></select></label>
+    </fieldset>
+    <div class="summary" id="summary" aria-live="polite">Pick a time block to see your total.</div>
+    <button class="btn wide" type="submit">Request booking</button>
+    <p class="formmsg" id="formMsg" role="status"></p>
+    <p class="small">Outside private bookings, the room is open to everyone for free, 10am – 10pm.</p>
+  </form>
+</template>
+
+<template id="panel-menu" data-title="Index">
+  <p class="kicker">Everything in the room</p>
+  <ul class="menu" id="menuList"></ul>
+</template>
+
+
+<script src="panels.js?v=1795006687"></script>
+<script>
+  const scene = document.getElementById("scene");
+  // show the room only once every picture in it has arrived; retry any that fail
+  const ready = () => document.body.classList.add("ready");
+  (() => {
+    const imgs = [...scene.querySelectorAll("image")];
+    const urls = [...new Set(imgs.map(i => i.getAttribute("href")))];
+    const bar = document.getElementById("loadbar"), txt = document.getElementById("loadtxt");
+    let done = 0;
+    const tick = () => {
+      done++;
+      bar.style.width = Math.round(done / urls.length * 100) + "%";
+      txt.textContent = `${done}/${urls.length}`;
+      if (done === urls.length) ready();
+    };
+    urls.forEach(u => {
+      let tries = 0;
+      const load = () => {
+        const im = new Image();
+        im.onload = () => {
+          // re-point any SVG image that gave up while the network was busy
+          if (tries) imgs.filter(i => i.getAttribute("href") === u).forEach(i => i.setAttribute("href", im.src));
+          (im.decode ? im.decode().catch(() => {}) : Promise.resolve()).then(tick);
+        };
+        im.onerror = () => { if (++tries < 4) setTimeout(load, 600 * tries); else tick(); };
+        im.src = tries ? `${u}?r=${tries}` : u;
+      };
+      load();
+    });
+    setTimeout(ready, 15000);   // never hold the room back forever
+  })();
+  function toggleLights() {
+    const on = document.body.classList.toggle("dark");
+    const b = document.getElementById("lightsBtn");
+    b.textContent = on ? "Lights on" : "Lights off"; b.setAttribute("aria-pressed", String(on));
+  }
+
+
+  // CCTV clock (Houston time) and open-play status
+  const fmt = new Intl.DateTimeFormat("en-CA", { timeZone:"America/Chicago", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false });
+  const tick2 = () => {
+    const p = Object.fromEntries(fmt.formatToParts(new Date()).map(x => [x.type, x.value]));
+    document.getElementById("clock").textContent = `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`;
+    const h = +p.hour % 24;
+    document.getElementById("openNow").innerHTML = (h >= 10 && h < 22)
+      ? '<span class="open">Open now</span> · daily 10–22'
+      : '<span class="closed">Closed</span> · open daily 10–22';
+  };
+  tick2(); setInterval(tick2, 1000);
+
+  // detection box: locks onto whatever you point at
+  const lock = document.getElementById("lock"), tip = document.getElementById("tip");
+  const TIPS = {
+    book:["Reserve the room", "Both consoles, both screens, up to 6 players. 2 hrs · $15."],
+    dropin:["Player 2 has joined.", "Open play is free, 10:00–22:00. Grab a controller."],
+    publishers:["Featured slot open", "Put your game on the main screen. Press START for packages."],
+    vision:["Shoes off.", "House rule #1. Respawn on the rug."],
+    setup:["2 consoles · 2 screens · 6 seats", "Scaffold, steel and CRTs inside POST Houston."],
+    sidescreen:["Also playing", "Small games and interactive art on the second screen."],
+    program:["snacks.exe", "Tournament nights, screenings and snacks. See the program."],
+    visit:["Live from POST Houston", "Find us in the atrium. Open daily."],
+    lights:["Lamp", "Click to switch the room lights."],
+  };
+  const LABELS = { book:"BOOK_THE_ROOM", dropin:"DROP_IN", publishers:"FEATURED_SCREEN", vision:"SHOES_OFF", setup:"THE_SETUP",
+    sidescreen:"SIDE_SCREEN", program:"SNACKS_&_NIGHTS", visit:"LIVE_CAM", lights:"LAMP" };
+  function lockOn(el) {
+    const id = el.dataset.id;
+    const els = [el.classList.contains("screen") ? el.querySelector(".bezel") : (el.querySelector(".lift > g > image, .lift > image") || el)];
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    els.forEach(e => { const r = e.getBoundingClientRect(); x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); });
+    const pad = 8;
+    Object.assign(lock.style, { left:(x0 - pad) + "px", top:(y0 - pad) + "px", width:(x1 - x0 + pad * 2) + "px", height:(y1 - y0 + pad * 2) + "px" });
+    lock.querySelector("b").textContent = `${NUMS[id] || ""} ${LABELS[id] || id.toUpperCase()} ${(0.9 + Math.random() * 0.09).toFixed(2)}`;
+    lock.classList.remove("on"); tip.classList.remove("on"); void lock.offsetWidth; lock.classList.add("on");
+    const t = TIPS[id];
+    if (t) {
+      tip.innerHTML = `<b>${t[0]}</b>${t[1]}`;
+      const tw = 260, left = Math.min(innerWidth - tw - 12, Math.max(12, x1 - 60));
+      Object.assign(tip.style, { left:left + "px", top:Math.min(innerHeight - 90, y0 + 18) + "px" });
+      tip.classList.add("on");
+    }
+  }
+  const NUMS = {}; document.querySelectorAll(".ptag").forEach(t => NUMS[t.dataset.for] = "ID" + t.querySelector(".num").textContent);
+  const pan = document.getElementById("pan");
+  const centre = () => { if (pan.scrollWidth > pan.clientWidth) pan.scrollLeft = (pan.scrollWidth - pan.clientWidth) * 0.42; };
+  addEventListener("load", centre); addEventListener("resize", centre);
+  ["touchstart", "wheel", "pointerdown"].forEach(ev => pan.addEventListener(ev, () => setTimeout(() => document.body.classList.add("swiped"), 1200), { once:true, passive:true }));
+  document.getElementById("rotateSkip").onclick = () => { document.body.classList.add("upright"); centre(); };
+
+  // no hover on touch screens: let the drawings play by themselves, one after another
+  if (matchMedia("(hover: none)").matches) {
+    const cycle = ["dropin", "program", "vision", "lights"]; let k = 0;
+    const tick = () => {
+      document.querySelectorAll(".piece.auto").forEach(p => p.classList.remove("on", "auto"));
+      document.querySelectorAll(`.piece[data-id="${cycle[k++ % cycle.length]}"]`).forEach(p => p.classList.add("on", "auto"));
+    };
+    tick(); setInterval(tick, 3600);
+  }
+  document.querySelectorAll(".ptag .card, .ptag .dot").forEach(c => {
+    const target = () => document.querySelector(`.piece[data-id="${c.dataset.for}"]`);
+    c.addEventListener("mouseenter", () => target()?.dispatchEvent(new Event("mouseenter")));
+    c.addEventListener("mouseleave", () => target()?.dispatchEvent(new Event("mouseleave")));
+    c.addEventListener("click", () => { const t = target(); if (!t) return; t.dataset.open ? openPanel(t.dataset.open) : toggleLights(); });
+  });
+  document.querySelectorAll(".piece[data-id]").forEach(el => {
+    if (el.dataset.id === "lights") el.addEventListener("click", toggleLights);
+    el.addEventListener("keydown", e => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      el.dataset.open ? openPanel(el.dataset.open) : toggleLights();
+    });
+    const on = () => {
+      scene.classList.add("hovering"); lockOn(el);
+      document.querySelectorAll(`.piece[data-id="${el.dataset.id}"]`).forEach(p => p.classList.add("on"));
+      document.querySelectorAll(`.ptag[data-for="${el.dataset.id}"]`).forEach(n => n.classList.add("on"));
+    };
+    const off = () => {
+      scene.classList.remove("hovering"); lock.classList.remove("on"); tip.classList.remove("on");
+      document.querySelectorAll(".piece.on, .ptag.on").forEach(n => n.classList.remove("on"));
+    };
+    el.addEventListener("mouseenter", on); el.addEventListener("mouseleave", off);
+    el.addEventListener("focus", on); el.addEventListener("blur", off);
+  });
+</script>
+</body>
+</html>
