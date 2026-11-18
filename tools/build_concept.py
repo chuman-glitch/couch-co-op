@@ -48,6 +48,8 @@ RACK = Q("rack", 714, 900)
 WAVY = Q("screen-wavy", 689, 900)
 STEEL = Q("steel-panel", 332, 900)
 PIPES = Q("pipes", 600, 900)
+LANTERNS = Q("lanterns", 621, 788)
+MUSHROOM = Q("lamp-mushroom", 398, 900)
 RACK_F = Q("rack-forest", 569, 900)
 
 # CRT screens inside the cut-outs (cut-out pixels) and the render footage they loop
@@ -156,7 +158,7 @@ PIECES = [
   # back: pipe scaffold + a rack with a big screen (right); a stainless panel and a wavy steel screen (left)
   dict(id=None,     src=PIPES,     at=(1900,520),  s=0.75, r=0, thin=True),
   dict(id=None,     src=RACK_F,    at=(1690,640),  s=0.62, r=0, thin=True, tv=TV_RACK),
-  dict(id=None,     src=STEEL,     at=(200,640),   s=0.62, r=-2, thin=True),
+  dict(id=None,     src=LANTERNS,  at=(150,640),   s=0.55, r=0),
   # floor: rugs
   dict(id="setup",  src=KILIM,     at=(1010,1170), s=1.05, sy=0.42, r=-3, flat=True),
   dict(id="vision", src=RUGS,      at=(1640,1215), s=0.62, sy=0.5, r=4, flat=True),
@@ -164,6 +166,7 @@ PIECES = [
   dict(id=None,     src=TOWER, polys=[TOWER_POLY], at=(1000,640), s=1.08, r=0, screens=True),
   # LAN corner: CRTs on cinderblocks, a CRT stack, all playing footage from the renders
   dict(id="program", src=CRT_BLOCKS, at=(1450,900), s=0.48, r=0, tv=TV_BLOCKS),
+  dict(id=None,     src=MUSHROOM,  at=(330,960),   s=0.36, r=0),
   # front: one floor sofa, one lounge chair, one pouf
   dict(id="dropin", src=FLOOR_SOFA, at=(640,1050), s=0.7,  r=-2),
   dict(id="book",   src=TOGO,      at=(1300,1060), s=0.52, r=3),
