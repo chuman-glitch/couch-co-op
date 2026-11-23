@@ -685,10 +685,12 @@ HTML = f'''<!doctype html>
 
   // no hover on touch screens: let the drawings play by themselves, one after another
   if (matchMedia("(hover: none)").matches) {{
-    const cycle = ["dropin", "program", "vision", "lights"]; let k = 0;
+    const cycle = ["dropin", "book", "program", "publishers"]; let k = 0;
     const tick = () => {{
-      document.querySelectorAll(".piece.auto").forEach(p => p.classList.remove("on", "auto"));
-      document.querySelectorAll(`.piece[data-id="${{cycle[k++ % cycle.length]}}"]`).forEach(p => p.classList.add("on", "auto"));
+      document.querySelectorAll(".piece.auto, .ptag.auto, .strip .hot").forEach(p => p.classList.remove("on", "auto", "hot"));
+      const id = cycle[k++ % cycle.length];
+      document.querySelectorAll(`.piece[data-id="${{id}}"], .ptag[data-for="${{id}}"]`).forEach(p => p.classList.add("on", "auto"));
+      document.querySelectorAll(`.strip [data-for="${{id}}"]`).forEach(b => b.classList.add("hot"));
     }};
     tick(); setInterval(tick, 3600);
   }}
@@ -833,6 +835,7 @@ QUIET_CSS = """
   .window a { color:var(--cut); }
   .window a.btn { color:#f3efe6 !important; text-decoration:none; }
   .window a.btn:not(.dark) { color:#141210 !important; }
+  .btn[hidden] { display:none !important; }
   .more { margin-top:18px; border-top:1px solid #1412101f; padding-top:12px; }
   .more summary { font:500 11px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase; cursor:pointer; list-style:none; color:#141210; }
   .more summary::-webkit-details-marker { display:none; }
@@ -841,6 +844,35 @@ QUIET_CSS = """
   .credit { margin-top:16px !important; }
   .study a { color:inherit; text-decoration:underline; text-underline-offset:3px; }
   @media (max-width:720px) { .sum { grid-template-columns:1fr; gap:16px; } .sum .pic { aspect-ratio:16 / 9 !important; } .kv div { grid-template-columns:84px 1fr; } }
+  /* ---------- phones & tablets: a labelled strip of every stop, one tap each ---------- */
+  .strip { display:none; }
+  @media (hover:none), (max-width:900px), (max-height:560px) {
+    .strip { display:flex; position:fixed; left:0; right:0; bottom:0; z-index:12; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+      padding:22px 12px calc(10px + env(safe-area-inset-bottom)); background:linear-gradient(#14110e00, #14110ef0 45%); scrollbar-width:none; }
+    .strip::-webkit-scrollbar { display:none; }
+    .strip button { flex:none; display:flex; gap:7px; align-items:center; background:var(--q-bg); color:var(--q-ink); border:1px solid var(--q-line);
+      font:500 12px/1 var(--mono); letter-spacing:.05em; padding:10px 12px; border-radius:0; cursor:pointer; }
+    .strip button b { font-weight:500; color:var(--q-dim); }
+    .strip button.hot { background:var(--q-ink); color:#000; } .strip button.hot b { color:#0009; }
+    .hud { display:none !important; }
+    .swipe { bottom:calc(70px + env(safe-area-inset-bottom)) !important; }
+    .hero p { display:none !important; }
+    .btn .long { display:none; }
+  }
+  @media (max-width:760px) and (orientation:portrait) {
+    .hero h1 { font-size:26px !important; } .hero { top:64px !important; }
+    .logo { font-size:12px !important; letter-spacing:.1em !important; }
+  }
+  /* windows on short screens: text only, no photo */
+  @media (max-height:560px) { .sum .pic { display:none; } .sum { grid-template-columns:1fr; } .window { max-height:calc(100svh - 24px) !important; } .winbody { padding:16px 20px 18px !important; } }
+  @media (max-width:720px) { .winbody { padding:18px 18px 20px !important; } .sum .display { font-size:26px !important; } }
+  /* start screen (phones held upright) */
+  .rotate-title { font:500 30px/1.1 var(--mono) !important; letter-spacing:-.02em; }
+  .rotate-title em { padding:0 .1em; }
+  .rotate-sub { font-family:var(--sans); }
+  .press { color:var(--q-ink) !important; font-family:var(--mono) !important; }
+  .rotate-skip { font-family:var(--mono); font-size:12px; }
+  .phone-screen { background:url("og-image.jpg") 30% center / cover !important; }
   body.og .top nav, body.og .hud, body.og .ptags, body.og .loader, body.og .study, body.og .hero p { display:none !important; }
   body.og .collage { opacity:1 !important; transition:none !important; }
   @media (max-height:560px) { .hero h1 { font-size:22px !important; } .hero { top:48px !important; } .logo { font-size:12px !important; } }
@@ -867,7 +899,14 @@ OG = """
 <meta name="twitter:image" content="https://couchco-op.com/og-image.jpg">
 <meta name="theme-color" content="#14110e">
 """
+SHORT = dict(dropin="Drop in", book="Book", program="Snacks & nights", vision="Shoes off", setup="The setup",
+             visit="Visit", publishers="Publishers", sidescreen="Side screen")
+STRIP = ('<nav class="strip" aria-label="Everything in the room">' + "".join(
+    f'<button data-open="{t["id"]}" data-for="{t["id"]}"><b>{t["num"]}</b>{SHORT.get(t["id"], t["id"])}</button>'
+    for t in sorted(TAGS, key=lambda t: t["num"])) + "</nav>")
 Q = HTML.replace("</head>", QUIET_CSS + OG + "</head>", 1)
+Q = Q.replace('<p class="swipe"', STRIP + '\n<p class="swipe"', 1)
+Q = Q.replace('<button class="btn primary" data-open="book">Book the room</button>', '<button class="btn primary" data-open="book">Book<span class="long"> the room</span></button>', 1)
 Q = Q.replace("<body>", '<body>\n<script>if (/[?&]og\\b/.test(location.search)) document.body.classList.add("og");</script>', 1)
 Q = Q.replace("LOADING THE LIVING ROOM", "LOADING", 1)
 Q = Q.replace("'<span class=\"open\">● OPEN NOW</span> · 10–22'", "'<span class=\"open\">Open now</span> · daily 10–22'", 1)

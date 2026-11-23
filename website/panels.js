@@ -2,6 +2,7 @@
    Everything you might want to change for Phase 1 lives in CONFIG. */
 const CONFIG = {
   email: "hi@novocollective.org",
+  calendly: "",            // Jerry's Calendly link, e.g. "https://calendly.com/…". Empty = the "Book a call" button stays hidden.
   blockHours: 2,           // rentals are sold in 2-hour blocks
   blockPrice: 15,          // USD per block, for the whole room
   maxBlocks: 2,            // longest single booking (2 blocks = 4 hours)
@@ -118,6 +119,8 @@ const INIT = {
     const subject = encodeURIComponent("Couch Co-Op · publisher placement");
     const body = encodeURIComponent("Hi Couch Co-Op,\n\nWe'd like to place a game in the pilot room.\n\nStudio / publisher:\nGame:\nPackage (Standard $3,000 / Premium $7,000):\nPreferred dates:\nPlatform / console:\n\nThanks!");
     $("#pubMail", root).href = `mailto:${CONFIG.email}?subject=${subject}&body=${body}`;
+    const cal = $("#calLink", root);
+    if (cal && CONFIG.calendly) { cal.href = CONFIG.calendly; cal.hidden = false; }
   },
 
   book(root) {
