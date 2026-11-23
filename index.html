@@ -329,6 +329,7 @@
   .window a { color:var(--cut); }
   .window a.btn { color:#f3efe6 !important; text-decoration:none; }
   .window a.btn:not(.dark) { color:#141210 !important; }
+  .btn[hidden] { display:none !important; }
   .more { margin-top:18px; border-top:1px solid #1412101f; padding-top:12px; }
   .more summary { font:500 11px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase; cursor:pointer; list-style:none; color:#141210; }
   .more summary::-webkit-details-marker { display:none; }
@@ -337,6 +338,35 @@
   .credit { margin-top:16px !important; }
   .study a { color:inherit; text-decoration:underline; text-underline-offset:3px; }
   @media (max-width:720px) { .sum { grid-template-columns:1fr; gap:16px; } .sum .pic { aspect-ratio:16 / 9 !important; } .kv div { grid-template-columns:84px 1fr; } }
+  /* ---------- phones & tablets: a labelled strip of every stop, one tap each ---------- */
+  .strip { display:none; }
+  @media (hover:none), (max-width:900px), (max-height:560px) {
+    .strip { display:flex; position:fixed; left:0; right:0; bottom:0; z-index:12; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+      padding:22px 12px calc(10px + env(safe-area-inset-bottom)); background:linear-gradient(#14110e00, #14110ef0 45%); scrollbar-width:none; }
+    .strip::-webkit-scrollbar { display:none; }
+    .strip button { flex:none; display:flex; gap:7px; align-items:center; background:var(--q-bg); color:var(--q-ink); border:1px solid var(--q-line);
+      font:500 12px/1 var(--mono); letter-spacing:.05em; padding:10px 12px; border-radius:0; cursor:pointer; }
+    .strip button b { font-weight:500; color:var(--q-dim); }
+    .strip button.hot { background:var(--q-ink); color:#000; } .strip button.hot b { color:#0009; }
+    .hud { display:none !important; }
+    .swipe { bottom:calc(70px + env(safe-area-inset-bottom)) !important; }
+    .hero p { display:none !important; }
+    .btn .long { display:none; }
+  }
+  @media (max-width:760px) and (orientation:portrait) {
+    .hero h1 { font-size:26px !important; } .hero { top:64px !important; }
+    .logo { font-size:12px !important; letter-spacing:.1em !important; }
+  }
+  /* windows on short screens: text only, no photo */
+  @media (max-height:560px) { .sum .pic { display:none; } .sum { grid-template-columns:1fr; } .window { max-height:calc(100svh - 24px) !important; } .winbody { padding:16px 20px 18px !important; } }
+  @media (max-width:720px) { .winbody { padding:18px 18px 20px !important; } .sum .display { font-size:26px !important; } }
+  /* start screen (phones held upright) */
+  .rotate-title { font:500 30px/1.1 var(--mono) !important; letter-spacing:-.02em; }
+  .rotate-title em { padding:0 .1em; }
+  .rotate-sub { font-family:var(--sans); }
+  .press { color:var(--q-ink) !important; font-family:var(--mono) !important; }
+  .rotate-skip { font-family:var(--mono); font-size:12px; }
+  .phone-screen { background:url("og-image.jpg") 30% center / cover !important; }
   body.og .top nav, body.og .hud, body.og .ptags, body.og .loader, body.og .study, body.og .hero p { display:none !important; }
   body.og .collage { opacity:1 !important; transition:none !important; }
   @media (max-height:560px) { .hero h1 { font-size:22px !important; } .hero { top:48px !important; } .logo { font-size:12px !important; } }
@@ -360,7 +390,7 @@
 <header class="top">
   <a class="logo" href="#"><img class="mark" src="favicon.svg" alt="" width="26" height="26">COUCH CO-OP</a>
   <span class="study">Pilot at POST Houston · by <a href="https://novocollective.org" target="_blank" rel="noopener">Nōvo Collective</a></span>
-  <nav><button class="btn ghost" data-open="menu" aria-haspopup="dialog">Index</button><button class="btn primary" data-open="book">Book the room</button></nav>
+  <nav><button class="btn ghost" data-open="menu" aria-haspopup="dialog">Index</button><button class="btn primary" data-open="book">Book<span class="long"> the room</span></button></nav>
 </header>
 <div class="loader" aria-hidden="true"><p>LOADING <span id="loadtxt"></span></p><div class="track"><i id="loadbar"></i></div></div>
 <div class="pan" id="pan"><svg class="collage" id="scene" viewBox="0 0 2000 1333" preserveAspectRatio="xMidYMax slice" role="group" aria-label="Couch Co-Op: a living room for play, collaged into the POST Houston atrium">
@@ -397,6 +427,7 @@
 <div class="hud br" id="openNow" aria-live="polite"></div>
 <div class="lock" id="lock" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
 <div class="tip" id="tip" aria-hidden="true"></div>
+<nav class="strip" aria-label="Everything in the room"><button data-open="dropin" data-for="dropin"><b>01</b>Drop in</button><button data-open="book" data-for="book"><b>02</b>Book</button><button data-open="program" data-for="program"><b>03</b>Snacks & nights</button><button data-open="vision" data-for="vision"><b>04</b>Shoes off</button><button data-open="setup" data-for="setup"><b>05</b>The setup</button><button data-open="visit" data-for="visit"><b>06</b>Visit</button><button data-open="publishers" data-for="publishers"><b>07</b>Publishers</button><button data-open="sidescreen" data-for="sidescreen"><b>08</b>Side screen</button></nav>
 <p class="swipe" aria-hidden="true">← swipe the room →</p>
 <div class="rotate" id="rotate">
   <div class="rotate-inner">
@@ -504,7 +535,7 @@
       <h3 class="display">Your game, <em>in the room</em></h3>
       <p class="lead">Real groups playing on real couches, inside POST Houston.</p>
       <dl class="kv"><div><dt>Standard</dt><dd><b>$3,000</b> · 10 days over two months</dd></div><div><dt>Premium</dt><dd><b>$7,000</b> · 30 days</dd></div><div><dt>You get</dt><dd>The main screen, foot traffic, an experiential campaign</dd></div></dl>
-      <div class="acts"><a class="btn" href="https://couchco-op.com/deck/" target="_blank" rel="noopener">View the deck</a><a class="btn dark" id="pubMail" href="mailto:hi@novocollective.org?subject=Couch%20Co-Op%20%C2%B7%20publisher%20placement">Request a placement</a><span class="small">or write to <a class="mail" href="mailto:hi@novocollective.org">hi@novocollective.org</a></span></div>
+      <div class="acts"><a class="btn" href="https://couchco-op.com/deck/" target="_blank" rel="noopener">View the deck</a><a class="btn" id="calLink" href="#" target="_blank" rel="noopener" hidden>Book a call with Jerry</a><a class="btn dark" id="pubMail" href="mailto:hi@novocollective.org?subject=Couch%20Co-Op%20%C2%B7%20publisher%20placement">Request a placement</a><span class="small">or write to <a class="mail" href="mailto:hi@novocollective.org">hi@novocollective.org</a></span></div>
     </div>
   </div>
 </template>
@@ -555,7 +586,7 @@
 </template>
 
 
-<script src="panels.js?v=1795006687"></script>
+<script src="panels.js?v=1795444642"></script>
 <script>
   const scene = document.getElementById("scene");
   let lastDrop = Date.now();
@@ -662,10 +693,12 @@
 
   // no hover on touch screens: let the drawings play by themselves, one after another
   if (matchMedia("(hover: none)").matches) {
-    const cycle = ["dropin", "program", "vision", "lights"]; let k = 0;
+    const cycle = ["dropin", "book", "program", "publishers"]; let k = 0;
     const tick = () => {
-      document.querySelectorAll(".piece.auto").forEach(p => p.classList.remove("on", "auto"));
-      document.querySelectorAll(`.piece[data-id="${cycle[k++ % cycle.length]}"]`).forEach(p => p.classList.add("on", "auto"));
+      document.querySelectorAll(".piece.auto, .ptag.auto, .strip .hot").forEach(p => p.classList.remove("on", "auto", "hot"));
+      const id = cycle[k++ % cycle.length];
+      document.querySelectorAll(`.piece[data-id="${id}"], .ptag[data-for="${id}"]`).forEach(p => p.classList.add("on", "auto"));
+      document.querySelectorAll(`.strip [data-for="${id}"]`).forEach(b => b.classList.add("hot"));
     };
     tick(); setInterval(tick, 3600);
   }

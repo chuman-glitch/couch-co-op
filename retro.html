@@ -375,7 +375,7 @@
       <h3 class="display">Your game, <em>in the room</em></h3>
       <p class="lead">Real groups playing on real couches, inside POST Houston.</p>
       <dl class="kv"><div><dt>Standard</dt><dd><b>$3,000</b> · 10 days over two months</dd></div><div><dt>Premium</dt><dd><b>$7,000</b> · 30 days</dd></div><div><dt>You get</dt><dd>The main screen, foot traffic, an experiential campaign</dd></div></dl>
-      <div class="acts"><a class="btn" href="https://couchco-op.com/deck/" target="_blank" rel="noopener">View the deck</a><a class="btn dark" id="pubMail" href="mailto:hi@novocollective.org?subject=Couch%20Co-Op%20%C2%B7%20publisher%20placement">Request a placement</a><span class="small">or write to <a class="mail" href="mailto:hi@novocollective.org">hi@novocollective.org</a></span></div>
+      <div class="acts"><a class="btn" href="https://couchco-op.com/deck/" target="_blank" rel="noopener">View the deck</a><a class="btn" id="calLink" href="#" target="_blank" rel="noopener" hidden>Book a call with Jerry</a><a class="btn dark" id="pubMail" href="mailto:hi@novocollective.org?subject=Couch%20Co-Op%20%C2%B7%20publisher%20placement">Request a placement</a><span class="small">or write to <a class="mail" href="mailto:hi@novocollective.org">hi@novocollective.org</a></span></div>
     </div>
   </div>
 </template>
@@ -426,7 +426,7 @@
 </template>
 
 
-<script src="panels.js?v=1795006687"></script>
+<script src="panels.js?v=1795444642"></script>
 <script>
   const scene = document.getElementById("scene");
   let lastDrop = Date.now();
@@ -533,10 +533,12 @@
 
   // no hover on touch screens: let the drawings play by themselves, one after another
   if (matchMedia("(hover: none)").matches) {
-    const cycle = ["dropin", "program", "vision", "lights"]; let k = 0;
+    const cycle = ["dropin", "book", "program", "publishers"]; let k = 0;
     const tick = () => {
-      document.querySelectorAll(".piece.auto").forEach(p => p.classList.remove("on", "auto"));
-      document.querySelectorAll(`.piece[data-id="${cycle[k++ % cycle.length]}"]`).forEach(p => p.classList.add("on", "auto"));
+      document.querySelectorAll(".piece.auto, .ptag.auto, .strip .hot").forEach(p => p.classList.remove("on", "auto", "hot"));
+      const id = cycle[k++ % cycle.length];
+      document.querySelectorAll(`.piece[data-id="${id}"], .ptag[data-for="${id}"]`).forEach(p => p.classList.add("on", "auto"));
+      document.querySelectorAll(`.strip [data-for="${id}"]`).forEach(b => b.classList.add("hot"));
     };
     tick(); setInterval(tick, 3600);
   }
