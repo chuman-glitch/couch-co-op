@@ -13,3 +13,6 @@ website/concept/cut2-rejects/
 
 # local tooling
 .claude/
+
+# the published publisher deck (couchco-op.com/deck)
+!website/deck/couch-co-op-deck.pdf

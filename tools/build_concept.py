@@ -832,6 +832,7 @@ QUIET_CSS = """
   .window .btn.dark { background:#141210 !important; color:#f3efe6 !important; box-shadow:none !important; }
   .window a { color:var(--cut); }
   .window a.btn { color:#f3efe6 !important; text-decoration:none; }
+  .window a.btn:not(.dark) { color:#141210 !important; }
   .more { margin-top:18px; border-top:1px solid #1412101f; padding-top:12px; }
   .more summary { font:500 11px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase; cursor:pointer; list-style:none; color:#141210; }
   .more summary::-webkit-details-marker { display:none; }
